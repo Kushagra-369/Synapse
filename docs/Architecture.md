@@ -243,3 +243,39 @@ execute(Command)
 CommandResult
 
 This ensures every feature behaves consistently, regardless of its internal implementation.
+
+## Validation Layer
+
+Before dispatching a command, Synapse validates the incoming command.
+
+Responsibilities:
+
+- Required field validation
+- Parameter validation
+- Security checks (future)
+- Permission checks (future)
+
+Only valid commands are forwarded to the Action Dispatcher.
+
+## Execution Pipeline
+
+Command
+↓
+
+Validation
+
+↓
+
+Dispatcher
+
+↓
+
+Skill Registry
+
+↓
+
+Skill
+
+↓
+
+Command Result
