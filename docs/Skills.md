@@ -168,3 +168,20 @@ Every Skill must:
 # Future
 
 Third-party developers should be able to build Skills using the Synapse SDK.
+
+# Skill Internal Architecture
+
+Each Skill manages multiple Actions.
+
+Example
+
+Clock Skill
+
+- SetAlarmAction
+- CancelAlarmAction
+- TimerAction
+- StopwatchAction
+
+The Skill decides which Action should execute based on the incoming command.
+
+This keeps every Action focused on one responsibility.

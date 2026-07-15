@@ -279,3 +279,26 @@ Skill
 ↓
 
 Command Result
+
+## Skill vs Action
+
+A Skill represents an application or Android feature.
+
+Examples:
+
+- Clock
+- Gallery
+- Maps
+
+An Action represents one capability inside a Skill.
+
+Example:
+
+Clock Skill
+
+- Set Alarm
+- Cancel Alarm
+- Timer
+- Stopwatch
+
+This separation keeps every Skill modular and easy to extend.
