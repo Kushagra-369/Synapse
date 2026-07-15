@@ -181,3 +181,65 @@ Example
 - Every action must be verifiable
 - Offline-first whenever possible
 - Privacy-first
+
+---
+
+# Runtime Architecture
+
+Once the AI (or any parser) converts user input into a structured command, Synapse executes it through the runtime engine.
+
+Command
+↓
+Action Dispatcher
+↓
+Skill Registry
+↓
+Requested Skill
+↓
+Android APIs
+↓
+Command Result
+
+---
+
+## Skill Registry
+
+The Skill Registry stores all available skills in memory.
+
+Each skill registers itself with a unique name.
+
+Example:
+
+- ClockSkill
+- GallerySkill
+- CalendarSkill
+- YouTubeSkill
+
+The Action Dispatcher never directly knows about any individual skill.
+
+Instead, it asks the Skill Registry for the requested skill.
+
+Benefits:
+
+- O(1) lookup using HashMap
+- Easy to add new skills
+- Dispatcher never needs modification
+- Supports future plugin architecture
+
+---
+
+## Core Contracts
+
+Every skill implements the same interface.
+
+Skill
+
+↓
+
+execute(Command)
+
+↓
+
+CommandResult
+
+This ensures every feature behaves consistently, regardless of its internal implementation.
