@@ -1,19 +1,19 @@
-package com.synapse.mobile.features.skills.clock
+package com.synapse.mobile.features.skills.calendar
 
 import com.synapse.mobile.core.actions.Skill
 import com.synapse.mobile.core.models.Command
 import com.synapse.mobile.core.models.CommandResult
-import com.synapse.mobile.features.skills.clock.actions.SetAlarmAction
-import com.synapse.mobile.features.skills.clock.gateway.ClockGateway
+import com.synapse.mobile.features.skills.calendar.actions.CreateEventAction
+import com.synapse.mobile.features.skills.calendar.gateway.CalendarGateway
 
-class ClockSkill(
-    private val gateway: ClockGateway
+class CalendarSkill(
+    gateway: CalendarGateway
 ) : Skill {
 
-    override val name = "clock"
+    override val name = "calendar"
 
     private val actions = mapOf(
-        "set_alarm" to SetAlarmAction(gateway)
+        "create_event" to CreateEventAction(gateway)
     )
 
     override fun execute(command: Command): CommandResult {

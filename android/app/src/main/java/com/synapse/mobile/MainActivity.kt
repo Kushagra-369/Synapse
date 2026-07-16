@@ -15,10 +15,39 @@ import com.synapse.mobile.ui.theme.SynapseTheme
 import android.util.Log
 import com.synapse.mobile.core.engine.SynapseEngine
 import com.synapse.mobile.core.models.Command
-
+import com.synapse.mobile.core.container.AppContainer
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 class MainActivity : ComponentActivity() {
+    private val callPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+
+        if (isGranted) {
+            Log.d("Synapse", "CALL_PHONE permission granted")
+        } else {
+            Log.d("Synapse", "CALL_PHONE permission denied")
+        }
+
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CALL_PHONE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+
+            callPermissionLauncher.launch(
+                Manifest.permission.CALL_PHONE
+            )
+
+        }
+
+        Log.e("Synapse", "MAIN START")
 
         try {
 
@@ -26,16 +55,20 @@ class MainActivity : ComponentActivity() {
 
             enableEdgeToEdge()
 
-            val engine = SynapseEngine()
+            val container = AppContainer(this)
+
+            val engine = SynapseEngine(
+                container.skillRegistry
+            )
 
             Log.d("Synapse", "2")
 
             val result = engine.execute(
                 Command(
-                    skill = "clock",
-                    action = "set_alarm",
+                    skill = "phone",
+                    action = "dial_phone",
                     parameters = mapOf(
-                        "time" to "06:00"
+                        "number" to "9416468645"
                     )
                 )
             )
