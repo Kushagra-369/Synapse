@@ -21,6 +21,40 @@ class AndroidPermissionManager(
 
     }
 
+    override fun getAndroidPermission(
+        permission: PermissionType
+    ): String? {
+
+        return when (permission) {
+
+            PermissionType.CONTACTS ->
+                Manifest.permission.READ_CONTACTS
+
+            PermissionType.PHONE ->
+                Manifest.permission.CALL_PHONE
+
+            PermissionType.SMS ->
+                Manifest.permission.SEND_SMS
+
+            PermissionType.CALENDAR ->
+                Manifest.permission.WRITE_CALENDAR
+
+            PermissionType.MICROPHONE ->
+                Manifest.permission.RECORD_AUDIO
+
+            PermissionType.CAMERA ->
+                Manifest.permission.CAMERA
+
+            PermissionType.STORAGE ->
+                Manifest.permission.READ_EXTERNAL_STORAGE
+
+            PermissionType.NOTIFICATIONS ->
+                Manifest.permission.POST_NOTIFICATIONS
+
+            else -> null
+        }
+    }
+
     override fun isGranted(
         permission: PermissionType
     ): Boolean {

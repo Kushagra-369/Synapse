@@ -1,20 +1,16 @@
-package com.synapse.mobile.features.onboarding
+package com.synapse.mobile.features.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
+import androidx.compose.runtime.Composable
 
 @Composable
-fun FinishScreen(
-    navController: NavController
-) {
+fun HomeScreen() {
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -23,28 +19,9 @@ fun FinishScreen(
     ) {
 
         Text(
-            text = "Synapse is Ready",
+            text = "Welcome to Synapse",
             style = MaterialTheme.typography.headlineMedium
         )
-
-        Button(
-            onClick = {
-
-                navController.navigate("home") {
-
-                    popUpTo("onboarding") {
-                        inclusive = true
-                    }
-
-                    launchSingleTop = true
-                }
-
-            }
-        ) {
-
-            Text("Finish")
-
-        }
 
     }
 

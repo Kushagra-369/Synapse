@@ -1,4 +1,9 @@
 package com.synapse.mobile.features.skills.contacts.gateway
 
-class ContactGateway {
+interface ContactGateway {
+
+    fun findContactNumber(
+        name: String
+    ): String?
+
 }

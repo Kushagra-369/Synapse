@@ -8,7 +8,7 @@ import com.synapse.mobile.features.onboarding.FinishScreen
 import com.synapse.mobile.features.onboarding.OnboardingScreen
 import com.synapse.mobile.features.onboarding.PermissionScreen
 import com.synapse.mobile.features.onboarding.SpecialAccessScreen
-
+import com.synapse.mobile.features.home.HomeScreen
 @Composable
 fun AppNavigation() {
 
@@ -33,6 +33,9 @@ fun AppNavigation() {
 
         composable("finish") {
             FinishScreen(navController)
+        }
+        composable("home") {
+            HomeScreen()
         }
 
     }

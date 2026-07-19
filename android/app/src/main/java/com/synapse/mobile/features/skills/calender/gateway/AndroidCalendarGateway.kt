@@ -1,7 +1,7 @@
 package com.synapse.mobile.features.skills.calendar.gateway
 
+import android.content.ContentValues
 import android.content.Context
-import android.content.Intent
 import android.provider.CalendarContract
 
 class AndroidCalendarGateway(
@@ -16,32 +16,77 @@ class AndroidCalendarGateway(
 
         return try {
 
-            val intent = Intent(Intent.ACTION_INSERT).apply {
+            val projection = arrayOf(
+                CalendarContract.Calendars._ID
+            )
 
-                data = CalendarContract.Events.CONTENT_URI
+            val cursor = context.contentResolver.query(
+                CalendarContract.Calendars.CONTENT_URI,
+                projection,
+                CalendarContract.Calendars.VISIBLE + " = 1",
+                null,
+                null
+            )
 
-                putExtra(
+            if (cursor == null) {
+                return false
+            }
+
+            var calendarId: Long? = null
+
+            cursor.use {
+
+                if (it.moveToFirst()) {
+
+                    calendarId = it.getLong(
+                        it.getColumnIndexOrThrow(
+                            CalendarContract.Calendars._ID
+                        )
+                    )
+
+                }
+
+            }
+
+            if (calendarId == null) {
+                return false
+            }
+
+            val values = ContentValues().apply {
+
+                put(
+                    CalendarContract.Events.CALENDAR_ID,
+                    calendarId
+                )
+
+                put(
                     CalendarContract.Events.TITLE,
                     title
                 )
 
-                putExtra(
-                    CalendarContract.EXTRA_EVENT_BEGIN_TIME,
+                put(
+                    CalendarContract.Events.DTSTART,
                     startTime
                 )
 
-                putExtra(
-                    CalendarContract.EXTRA_EVENT_END_TIME,
+                put(
+                    CalendarContract.Events.DTEND,
                     endTime
                 )
 
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                put(
+                    CalendarContract.Events.EVENT_TIMEZONE,
+                    java.util.TimeZone.getDefault().id
+                )
 
             }
 
-            context.startActivity(intent)
+            val uri = context.contentResolver.insert(
+                CalendarContract.Events.CONTENT_URI,
+                values
+            )
 
-            true
+            uri != null
 
         } catch (e: Exception) {
 

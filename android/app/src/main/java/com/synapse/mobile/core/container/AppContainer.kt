@@ -17,6 +17,12 @@ import com.synapse.mobile.features.skills.calendar.gateway.CalendarGateway
 import com.synapse.mobile.features.skills.phone.PhoneSkill
 import com.synapse.mobile.features.skills.phone.gateway.AndroidPhoneGateway
 import com.synapse.mobile.features.skills.phone.gateway.PhoneGateway
+import com.synapse.mobile.features.skills.contacts.ContactSkill
+import com.synapse.mobile.features.skills.contacts.gateway.AndroidContactGateway
+import com.synapse.mobile.features.skills.contacts.gateway.ContactGateway
+import com.synapse.mobile.features.skills.apps.AppsSkill
+import com.synapse.mobile.features.skills.apps.gateway.AndroidAppGateway
+import com.synapse.mobile.features.skills.apps.gateway.AppGateway
 class AppContainer(
     context: Context
 ) {
@@ -33,8 +39,16 @@ class AppContainer(
     val calendarGateway: CalendarGateway =
         AndroidCalendarGateway(context)
 
+    val contactGateway: ContactGateway =
+        AndroidContactGateway(context.contentResolver)
+
+    val appGateway: AppGateway =
+        AndroidAppGateway(context)
+
     val phoneGateway: PhoneGateway =
         AndroidPhoneGateway(context)
+
+
     val skillRegistry = SkillRegistry().apply {
 
         register(
@@ -55,6 +69,14 @@ class AppContainer(
 
         register(
             PhoneSkill(phoneGateway)
+        )
+
+        register(
+            ContactSkill(contactGateway)
+        )
+
+        register(
+            AppsSkill(appGateway)
         )
 
     }

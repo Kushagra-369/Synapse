@@ -10,4 +10,8 @@ interface PermissionManager {
         permission: PermissionType
     ): Boolean
 
+    fun getAndroidPermission(
+        permission: PermissionType
+    ): String?
+
 }
