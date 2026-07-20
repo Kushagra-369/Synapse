@@ -1,5 +1,5 @@
 package com.synapse.mobile.features.developer
-
+import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -58,7 +58,7 @@ fun DeveloperScreen(
 
             }
         ) {
-            Text("Test Phone")
+            org.w3c.dom.Text("Test Phone")
         }
 
         Button(

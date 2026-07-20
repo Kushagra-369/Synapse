@@ -32,9 +32,14 @@ import com.synapse.mobile.features.skills.maps.gateway.MapsGateway
 import com.synapse.mobile.features.skills.flashlight.FlashlightSkill
 import com.synapse.mobile.features.skills.flashlight.gateway.AndroidFlashlightGateway
 import com.synapse.mobile.features.skills.flashlight.gateway.FlashlightGateway
+import com.synapse.mobile.features.skills.gallery.GallerySkill
+import com.synapse.mobile.features.skills.gallery.gateway.AndroidGalleryGateway
+import com.synapse.mobile.features.skills.gallery.gateway.GalleryGateway
 class AppContainer(
     context: Context
 ) {
+    val galleryGateway: GalleryGateway =
+        AndroidGalleryGateway(context)
     val flashlightGateway: FlashlightGateway =
         AndroidFlashlightGateway(context)
     val mapsGateway: MapsGateway =
@@ -66,8 +71,14 @@ class AppContainer(
     val skillRegistry = SkillRegistry().apply {
 
         register(
+            GallerySkill(galleryGateway)
+        )
+
+        register(
             FlashlightSkill(flashlightGateway)
         )
+
+
 
         register(
             MapsSkill(mapsGateway)
