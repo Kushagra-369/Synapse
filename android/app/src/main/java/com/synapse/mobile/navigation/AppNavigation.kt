@@ -9,8 +9,12 @@ import com.synapse.mobile.features.onboarding.OnboardingScreen
 import com.synapse.mobile.features.onboarding.PermissionScreen
 import com.synapse.mobile.features.onboarding.SpecialAccessScreen
 import com.synapse.mobile.features.home.HomeScreen
+import com.synapse.mobile.core.engine.SynapseEngine
+import com.synapse.mobile.features.developer.DeveloperScreen
 @Composable
-fun AppNavigation() {
+fun AppNavigation(
+    engine: SynapseEngine
+) {
 
     val navController = rememberNavController()
 
@@ -35,7 +39,10 @@ fun AppNavigation() {
             FinishScreen(navController)
         }
         composable("home") {
-            HomeScreen()
+            HomeScreen(navController)
+        }
+        composable("developer") {
+            DeveloperScreen(navController, engine)
         }
 
     }

@@ -23,6 +23,9 @@ import com.synapse.mobile.features.skills.contacts.gateway.ContactGateway
 import com.synapse.mobile.features.skills.apps.AppsSkill
 import com.synapse.mobile.features.skills.apps.gateway.AndroidAppGateway
 import com.synapse.mobile.features.skills.apps.gateway.AppGateway
+import com.synapse.mobile.features.skills.browser.BrowserSkill
+import com.synapse.mobile.features.skills.browser.gateway.AndroidBrowserGateway
+import com.synapse.mobile.features.skills.browser.gateway.BrowserGateway
 class AppContainer(
     context: Context
 ) {
@@ -48,6 +51,8 @@ class AppContainer(
     val phoneGateway: PhoneGateway =
         AndroidPhoneGateway(context)
 
+    val browserGateway: BrowserGateway =
+        AndroidBrowserGateway(context)
 
     val skillRegistry = SkillRegistry().apply {
 
@@ -77,6 +82,10 @@ class AppContainer(
 
         register(
             AppsSkill(appGateway)
+        )
+
+        register(
+            BrowserSkill(browserGateway)
         )
 
     }
