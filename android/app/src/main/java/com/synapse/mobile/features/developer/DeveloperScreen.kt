@@ -58,7 +58,7 @@ fun DeveloperScreen(
 
             }
         ) {
-            org.w3c.dom.Text("Test Phone")
+            Text("Test Phone")
         }
 
         Button(
@@ -184,41 +184,7 @@ fun DeveloperScreen(
             Text("Current Location")
         }
 
-        Button(
-            onClick = {
-
-                result = engine.execute(
-                    Command(
-                        skill = "flashlight",
-                        action = "turn_on",
-                        parameters = emptyMap()
-                    )
-                )
-
-            }
-        ) {
-
-            Text("Flashlight ON")
-
-        }
-
-        Button(
-            onClick = {
-
-                result = engine.execute(
-                    Command(
-                        skill = "flashlight",
-                        action = "turn_off",
-                        parameters = emptyMap()
-                    )
-                )
-
-            }
-        ) {
-
-            Text("Flashlight OFF")
-
-        }
+     
 
         Button(
             onClick = {
@@ -236,6 +202,48 @@ fun DeveloperScreen(
 
             Text("Toggle Flashlight")
 
+        }
+
+        Button(
+            onClick = {
+                result = engine.execute(
+                    Command(
+                        skill = "gallery",
+                        action = "open_gallery",
+                        parameters = emptyMap()
+                    )
+                )
+            }
+        ) {
+            Text("Open Gallery")
+        }
+
+        Button(
+            onClick = {
+                result = engine.execute(
+                    Command(
+                        skill = "gallery",
+                        action = "open_photos",
+                        parameters = emptyMap()
+                    )
+                )
+            }
+        ) {
+            Text("Open Photos")
+        }
+
+        Button(
+            onClick = {
+                result = engine.execute(
+                    Command(
+                        skill = "gallery",
+                        action = "open_videos",
+                        parameters = emptyMap()
+                    )
+                )
+            }
+        ) {
+            Text("Open Videos")
         }
 
         Card(
