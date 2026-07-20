@@ -110,6 +110,133 @@ fun DeveloperScreen(
         ) {
             Text("Test Browser")
         }
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+                    Command(
+                        skill = "maps",
+                        action = "open_maps",
+                        parameters = mapOf(
+                            "query" to "India Gate Delhi"
+                        )
+                    )
+                )
+
+            }
+        ) {
+            Text("Open Maps")
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+                    Command(
+                        skill = "maps",
+                        action = "search_place",
+                        parameters = mapOf(
+                            "place" to "Red Fort Delhi"
+                        )
+                    )
+                )
+
+            }
+        ) {
+            Text("Search Place")
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+                    Command(
+                        skill = "maps",
+                        action = "navigate",
+                        parameters = mapOf(
+                            "destination" to "Connaught Place Delhi"
+                        )
+                    )
+                )
+
+            }
+        ) {
+            Text("Navigate")
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+                    Command(
+                        skill = "maps",
+                        action = "get_current_location",
+                        parameters = emptyMap()
+                    )
+                )
+
+            }
+        ) {
+            Text("Current Location")
+        }
+
+        Button(
+            onClick = {
+
+                result = engine.execute(
+                    Command(
+                        skill = "flashlight",
+                        action = "turn_on",
+                        parameters = emptyMap()
+                    )
+                )
+
+            }
+        ) {
+
+            Text("Flashlight ON")
+
+        }
+
+        Button(
+            onClick = {
+
+                result = engine.execute(
+                    Command(
+                        skill = "flashlight",
+                        action = "turn_off",
+                        parameters = emptyMap()
+                    )
+                )
+
+            }
+        ) {
+
+            Text("Flashlight OFF")
+
+        }
+
+        Button(
+            onClick = {
+
+                result = engine.execute(
+                    Command(
+                        skill = "flashlight",
+                        action = "toggle",
+                        parameters = emptyMap()
+                    )
+                )
+
+            }
+        ) {
+
+            Text("Toggle Flashlight")
+
+        }
 
         Card(
             modifier = Modifier.fillMaxWidth()

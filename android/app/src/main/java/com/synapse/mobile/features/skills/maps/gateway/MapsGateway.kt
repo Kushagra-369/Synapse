@@ -1,0 +1,19 @@
+package com.synapse.mobile.features.skills.maps.gateway
+
+interface MapsGateway {
+
+    fun getCurrentLocation(): String?
+
+    fun openMaps(
+        query: String
+    ): Boolean
+
+    fun navigate(
+        destination: String
+    ): Boolean
+
+    fun searchPlace(
+        place: String
+    ): Boolean
+
+}

@@ -26,10 +26,19 @@ import com.synapse.mobile.features.skills.apps.gateway.AppGateway
 import com.synapse.mobile.features.skills.browser.BrowserSkill
 import com.synapse.mobile.features.skills.browser.gateway.AndroidBrowserGateway
 import com.synapse.mobile.features.skills.browser.gateway.BrowserGateway
+import com.synapse.mobile.features.skills.maps.MapsSkill
+import com.synapse.mobile.features.skills.maps.gateway.AndroidMapsGateway
+import com.synapse.mobile.features.skills.maps.gateway.MapsGateway
+import com.synapse.mobile.features.skills.flashlight.FlashlightSkill
+import com.synapse.mobile.features.skills.flashlight.gateway.AndroidFlashlightGateway
+import com.synapse.mobile.features.skills.flashlight.gateway.FlashlightGateway
 class AppContainer(
     context: Context
 ) {
-
+    val flashlightGateway: FlashlightGateway =
+        AndroidFlashlightGateway(context)
+    val mapsGateway: MapsGateway =
+        AndroidMapsGateway(context)
     val clockGateway: ClockGateway =
         AndroidClockGateway(context)
 
@@ -55,6 +64,14 @@ class AppContainer(
         AndroidBrowserGateway(context)
 
     val skillRegistry = SkillRegistry().apply {
+
+        register(
+            FlashlightSkill(flashlightGateway)
+        )
+
+        register(
+            MapsSkill(mapsGateway)
+        )
 
         register(
             ClockSkill(clockGateway)
