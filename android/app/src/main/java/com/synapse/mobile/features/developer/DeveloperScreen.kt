@@ -65,6 +65,196 @@ fun DeveloperScreen(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
 
+                result = engine.execute(
+
+                    Command(
+                        skill = "whatsapp",
+                        action = "open",
+                        parameters = emptyMap()
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Open WhatsApp")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "whatsapp",
+                        action = "send_message",
+                        parameters = mapOf(
+
+                            "phone" to "919215808489",
+
+                            "message" to "Hello from Synapse"
+
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Send Message")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "whatsapp",
+                        action = "open_chat",
+                        parameters = mapOf(
+
+                            "phone" to "919215808489"
+
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Open Chat")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "whatsapp",
+                        action = "voice_call",
+                        parameters = mapOf(
+
+                            "phone" to "919215808489"
+
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Voice Call")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "whatsapp",
+                        action = "video_call",
+                        parameters = mapOf(
+
+                            "phone" to "919215808489"
+
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Video Call")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "youtube",
+                        action = "open",
+                        parameters = emptyMap()
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Open YouTube")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "youtube",
+                        action = "search",
+                        parameters = mapOf(
+                            "query" to "shadow king dost"
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Search YouTube")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "youtube",
+                        action = "play",
+                        parameters = mapOf(
+                            "query" to "Interstellar Theme"
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Play Video")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
                 val cal = Calendar.getInstance().apply {
                     set(2026, Calendar.JULY, 20, 12, 0, 0)
                 }
@@ -184,7 +374,7 @@ fun DeveloperScreen(
             Text("Current Location")
         }
 
-     
+
 
         Button(
             onClick = {

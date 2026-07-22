@@ -35,9 +35,19 @@ import com.synapse.mobile.features.skills.flashlight.gateway.FlashlightGateway
 import com.synapse.mobile.features.skills.gallery.GallerySkill
 import com.synapse.mobile.features.skills.gallery.gateway.AndroidGalleryGateway
 import com.synapse.mobile.features.skills.gallery.gateway.GalleryGateway
+import com.synapse.mobile.features.skills.youtube.YouTubeSkill
+import com.synapse.mobile.features.skills.youtube.gateway.AndroidYouTubeGateway
+import com.synapse.mobile.features.skills.youtube.gateway.YouTubeGateway
+import com.synapse.mobile.features.skills.whatsapp.WhatsAppSkill
+import com.synapse.mobile.features.skills.whatsapp.gateway.AndroidWhatsAppGateway
+import com.synapse.mobile.features.skills.whatsapp.gateway.WhatsAppGateway
 class AppContainer(
     context: Context
 ) {
+    val whatsAppGateway: WhatsAppGateway =
+        AndroidWhatsAppGateway(context)
+    val youtubeGateway: YouTubeGateway =
+        AndroidYouTubeGateway(context)
     val galleryGateway: GalleryGateway =
         AndroidGalleryGateway(context)
     val flashlightGateway: FlashlightGateway =
@@ -71,6 +81,12 @@ class AppContainer(
     val skillRegistry = SkillRegistry().apply {
 
         register(
+            WhatsAppSkill(
+                whatsAppGateway
+            )
+        )
+
+        register(
             GallerySkill(galleryGateway)
         )
 
@@ -78,6 +94,9 @@ class AppContainer(
             FlashlightSkill(flashlightGateway)
         )
 
+        register(
+            YouTubeSkill(youtubeGateway)
+        )
 
 
         register(
