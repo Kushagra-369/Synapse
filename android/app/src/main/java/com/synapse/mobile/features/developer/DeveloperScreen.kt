@@ -18,12 +18,17 @@ import com.synapse.mobile.core.engine.SynapseEngine
 import com.synapse.mobile.core.models.Command
 import com.synapse.mobile.core.models.CommandResult
 import java.util.Calendar
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+
 
 @Composable
 fun DeveloperScreen(
     navController: NavController,
     engine: SynapseEngine
 ) {
+
+
 
     var result by remember {
         mutableStateOf<CommandResult?>(null)
@@ -32,9 +37,8 @@ fun DeveloperScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         Text(
@@ -59,6 +63,349 @@ fun DeveloperScreen(
             }
         ) {
             Text("Test Phone")
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "device",
+                        action = "set_brightness",
+                        parameters = mapOf(
+                            "percentage" to 25
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Brightness 25%")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "device",
+                        action = "set_brightness",
+                        parameters = mapOf(
+                            "percentage" to 50
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Brightness 50%")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "device",
+                        action = "set_brightness",
+                        parameters = mapOf(
+                            "percentage" to 100
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Brightness 100%")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "device",
+                        action = "set_volume",
+                        parameters = mapOf(
+                            "percentage" to 25
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Volume 25%")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "device",
+                        action = "set_volume",
+                        parameters = mapOf(
+                            "percentage" to 50
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Volume 50%")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "device",
+                        action = "set_volume",
+                        parameters = mapOf(
+                            "percentage" to 100
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Volume 100%")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "device",
+                        action = "set_wifi",
+                        parameters = mapOf(
+                            "enabled" to true
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("WiFi ON")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "device",
+                        action = "set_wifi",
+                        parameters = mapOf(
+                            "enabled" to false
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("WiFi OFF")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "device",
+                        action = "set_bluetooth",
+                        parameters = mapOf(
+                            "enabled" to true
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Bluetooth ON")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "device",
+                        action = "set_bluetooth",
+                        parameters = mapOf(
+                            "enabled" to false
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Bluetooth OFF")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "device",
+                        action = "set_rotation",
+                        parameters = mapOf(
+                            "enabled" to true
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Rotation ON")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "device",
+                        action = "set_rotation",
+                        parameters = mapOf(
+                            "enabled" to false
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Rotation OFF")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "device",
+                        action = "set_dnd",
+                        parameters = mapOf(
+                            "enabled" to true
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("DND ON")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "device",
+                        action = "set_dnd",
+                        parameters = mapOf(
+                            "enabled" to false
+                        )
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("DND OFF")
+
+        }
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                result = engine.execute(
+
+                    Command(
+                        skill = "device",
+                        action = "get_battery",
+                        parameters = emptyMap()
+                    )
+
+                )
+
+            }
+        ) {
+
+            Text("Battery Status")
+
         }
 
         Button(

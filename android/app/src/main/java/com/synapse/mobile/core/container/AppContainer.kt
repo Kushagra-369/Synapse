@@ -41,9 +41,14 @@ import com.synapse.mobile.features.skills.youtube.gateway.YouTubeGateway
 import com.synapse.mobile.features.skills.whatsapp.WhatsAppSkill
 import com.synapse.mobile.features.skills.whatsapp.gateway.AndroidWhatsAppGateway
 import com.synapse.mobile.features.skills.whatsapp.gateway.WhatsAppGateway
+import com.synapse.mobile.features.skills.device.DeviceSkill
+import com.synapse.mobile.features.skills.device.gateway.AndroidDeviceGateway
+import com.synapse.mobile.features.skills.device.gateway.DeviceGateway
 class AppContainer(
     context: Context
 ) {
+    val deviceGateway: DeviceGateway =
+        AndroidDeviceGateway(context)
     val whatsAppGateway: WhatsAppGateway =
         AndroidWhatsAppGateway(context)
     val youtubeGateway: YouTubeGateway =
@@ -79,6 +84,10 @@ class AppContainer(
         AndroidBrowserGateway(context)
 
     val skillRegistry = SkillRegistry().apply {
+
+        register(
+            DeviceSkill(deviceGateway)
+        )
 
         register(
             WhatsAppSkill(
