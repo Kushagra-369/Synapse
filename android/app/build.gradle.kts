@@ -38,6 +38,11 @@ android {
 }
 
 dependencies {
+    implementation(libs.retrofit)
+    implementation(libs.converterGson)
+    implementation(libs.okhttp)
+    implementation(libs.loggingInterceptor)
+    implementation(libs.gson)
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("androidx.navigation:navigation-compose:2.9.3")
     implementation(platform(libs.androidx.compose.bom))
