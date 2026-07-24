@@ -20,7 +20,9 @@ import com.synapse.mobile.core.models.CommandResult
 import java.util.Calendar
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import com.synapse.mobile.features.ai.GeminiClient
 
 @Composable
 fun DeveloperScreen(
@@ -34,6 +36,13 @@ fun DeveloperScreen(
         mutableStateOf<CommandResult?>(null)
     }
 
+    var aiResult by remember {
+        mutableStateOf("")
+    }
+    val scope = rememberCoroutineScope()
+
+    val gemini = GeminiClient()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -45,6 +54,7 @@ fun DeveloperScreen(
             "Developer Mode",
             style = MaterialTheme.typography.headlineMedium
         )
+
 
         Button(
             modifier = Modifier.fillMaxWidth(),
@@ -64,6 +74,8 @@ fun DeveloperScreen(
         ) {
             Text("Test Phone")
         }
+
+
 
         Button(
             modifier = Modifier.fillMaxWidth(),
@@ -783,6 +795,27 @@ fun DeveloperScreen(
             Text("Open Videos")
         }
 
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+
+                scope.launch {
+
+                    aiResult = gemini.generate(
+                        "Say Hello in one sentence."
+                    )
+
+
+
+                }
+
+            }
+        ) {
+
+            Text("Test Gemini")
+
+        }
+
         Card(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -799,8 +832,15 @@ fun DeveloperScreen(
                 result?.let {
 
                     Text("Success : ${it.success}")
-
                     Text(it.message)
+
+                }
+
+                if (aiResult.isNotBlank()) {
+
+                    Text("Gemini Response")
+
+                    Text(aiResult)
 
                 }
 
