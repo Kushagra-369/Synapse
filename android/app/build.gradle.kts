@@ -12,9 +12,9 @@ val geminiApiKey = providers
     .get()
 
 
-println("Gemini Key = '$geminiApiKey'")
 android {
-    namespace = "com.synapse.mobile"
+       namespace = "com.synapse.mobile"
+
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -27,6 +27,7 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+
         buildConfigField(
             "String",
             "GEMINI_API_KEY",
