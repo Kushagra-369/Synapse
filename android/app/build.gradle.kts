@@ -1,10 +1,18 @@
+
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
 }
 
-val geminiApiKey = project.findProperty("GEMINI_API_KEY") as String? ?: ""
 
+val geminiApiKey = providers
+    .gradleProperty("GEMINI_API_KEY")
+    .orElse("")
+    .get()
+
+
+println("Gemini Key = '$geminiApiKey'")
 android {
     namespace = "com.synapse.mobile"
     compileSdk {

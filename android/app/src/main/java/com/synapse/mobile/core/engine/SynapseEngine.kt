@@ -6,37 +6,48 @@ import com.synapse.mobile.core.models.BatchResult
 import com.synapse.mobile.core.models.Command
 import com.synapse.mobile.core.models.CommandBatch
 import com.synapse.mobile.core.models.CommandResult
+import com.synapse.mobile.core.validation.CommandValidator
 import com.synapse.mobile.core.validation.DefaultCommandValidator
 
+/**
+ * Central execution engine for Synapse.
+ *
+ * Responsibilities:
+ * - Validate commands
+ * - Dispatch commands to the correct skill
+ * - Execute command batches
+ *
+ * This class is stateless and thread-safe.
+ */
 class SynapseEngine(
-    registry: SkillRegistry
+    registry: SkillRegistry,
+    private val validator: CommandValidator = DefaultCommandValidator()
 ) {
 
     private val dispatcher = ActionDispatcher(registry)
 
-    private val validator = DefaultCommandValidator()
-
+    /**
+     * Executes a single command.
+     */
     fun execute(command: Command): CommandResult {
 
-        val validation = validator.validate(command)
-
-        if (validation != null) {
-            return validation
+        validator.validate(command)?.let {
+            return it
         }
 
         return dispatcher.dispatch(command)
     }
 
+    /**
+     * Executes multiple commands sequentially.
+     */
     fun executeBatch(batch: CommandBatch): BatchResult {
 
-        val results = mutableListOf<CommandResult>()
-
-        for (command in batch.commands) {
-
-            val result = execute(command)
-
-            results.add(result)
+        if (batch.commands.isEmpty()) {
+            return BatchResult(emptyList())
         }
+
+        val results = batch.commands.map(::execute)
 
         return BatchResult(results)
     }

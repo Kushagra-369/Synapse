@@ -43,7 +43,11 @@ class GeminiClient : AIClient {
 
             if (!response.isSuccessful) {
 
-                return "ERROR: ${response.code()}"
+                return """
+ERROR ${response.code()}
+
+${response.errorBody()?.string()}
+""".trimIndent()
 
             }
 
