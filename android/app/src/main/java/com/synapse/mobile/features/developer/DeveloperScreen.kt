@@ -24,20 +24,11 @@ fun DeveloperScreen(
     engine: SynapseEngine
 ) {
 
-    var prompt by remember {
-        mutableStateOf("")
-    }
-
-    var loading by remember {
-        mutableStateOf(false)
-    }
-
-    var result by remember {
-        mutableStateOf<CommandResult?>(null)
-    }
+    var prompt by remember { mutableStateOf("") }
+    var loading by remember { mutableStateOf(false) }
+    var result by remember { mutableStateOf<CommandResult?>(null) }
 
     val scope = rememberCoroutineScope()
-
     val processor = AIProcessor(engine)
 
     Column(
@@ -55,16 +46,10 @@ fun DeveloperScreen(
 
         OutlinedTextField(
             value = prompt,
-            onValueChange = {
-                prompt = it
-            },
+            onValueChange = { prompt = it },
             modifier = Modifier.fillMaxWidth(),
-            label = {
-                Text("Ask Synapse")
-            },
-            placeholder = {
-                Text("Example: Play Arijit Singh songs")
-            }
+            label = { Text("Ask Synapse") },
+            placeholder = { Text("Example: Play Arijit Singh songs") }
         )
 
         Button(
@@ -74,8 +59,8 @@ fun DeveloperScreen(
 
                 if (prompt.isBlank()) {
                     result = CommandResult(
-                        false,
-                        "Please enter a command."
+                        success = false,
+                        message = "Please enter a command."
                     )
                     return@Button
                 }
@@ -83,22 +68,17 @@ fun DeveloperScreen(
                 scope.launch {
 
                     loading = true
-
                     result = processor.process(prompt)
-
                     loading = false
+
                 }
             }
         ) {
 
             if (loading) {
-
                 CircularProgressIndicator()
-
             } else {
-
                 Text("Execute")
-
             }
 
         }
@@ -118,11 +98,8 @@ fun DeveloperScreen(
                 )
 
                 result?.let {
-
                     Text("Success: ${it.success}")
-
                     Text(it.message)
-
                 }
 
             }
