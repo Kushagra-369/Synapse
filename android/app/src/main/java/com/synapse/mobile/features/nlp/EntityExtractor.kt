@@ -55,6 +55,11 @@ object EntityExtractor {
         extractApp(text)?.let { params["app"] = it }
         extractContact(text)?.let { params["contact"] = it }
         extractWebsite(text)?.let { params["website"] = it }
+        if (!params.containsKey("website")) {
+            extractApp(text)?.let {
+                params["app"] = it
+            }
+        }
         extractNumber(text)?.let { params["number"] = it }
         extractTime(text)?.let { params["time"] = it }
 

@@ -36,6 +36,7 @@ object IntentDetector {
             isFlashlightOff(lower) -> IntentType.FLASHLIGHT_OFF
             isBrightness(lower) -> IntentType.SET_BRIGHTNESS
             isVolume(lower) -> IntentType.SET_VOLUME
+            isWebsite(lower) -> IntentType.OPEN_WEBSITE
             isOpen(lower) -> IntentType.OPEN_APP
             isClose(lower) -> IntentType.CLOSE_APP
             else -> IntentType.UNKNOWN
@@ -46,6 +47,15 @@ object IntentDetector {
 
     private fun containsAny(text: String, aliases: List<String>): Boolean {
         return aliases.any { text.contains(it) }
+    }
+
+    private fun isWebsite(text: String): Boolean {
+        return text.contains(".com") ||
+                text.contains(".in") ||
+                text.contains(".org") ||
+                text.contains(".net") ||
+                text.contains("website") ||
+                text.contains("browser")
     }
 
     // --- Intent checks ---

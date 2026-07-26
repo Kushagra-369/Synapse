@@ -13,7 +13,7 @@ class PhoneSkill(
     override val name = "phone"
 
     private val actions = mapOf(
-        "dial_phone" to MakeCallAction(gateway)
+        "call" to MakeCallAction(gateway)
     )
 
     override fun execute(command: Command): CommandResult {

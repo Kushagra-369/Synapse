@@ -2,15 +2,18 @@ package com.synapse.mobile.features.ai
 
 import android.util.Log
 import com.synapse.mobile.core.engine.SynapseEngine
-import com.synapse.mobile.core.models.Command
 import com.synapse.mobile.core.models.CommandResult
+import com.synapse.mobile.features.nlp.NLPProcessor
+import com.synapse.mobile.features.nlp.parser.MultiCommandParser
 
 class AIProcessor(
 
-    private val engine: SynapseEngine,
-    private val aiClient: AIClient = GeminiClient()
+    private val engine: SynapseEngine
 
 ) {
+
+    private val multiCommandParser = MultiCommandParser()
+    private val nlpProcessor = NLPProcessor()
 
     suspend fun process(
         userInput: String
@@ -18,37 +21,69 @@ class AIProcessor(
 
         return try {
 
-            Log.d("Synapse-AI", "User: $userInput")
+            Log.d("Synapse-AI", "Input: $userInput")
 
-            val prompt = PromptBuilder.build(userInput)
+            val commands = multiCommandParser.parse(userInput)
 
-            Log.d("Synapse-AI", "Prompt:\n$prompt")
+            if (commands.isEmpty()) {
 
-            val aiResponse = aiClient.generate(prompt)
+                return CommandResult(
+                    success = false,
+                    message = "No command detected."
+                )
 
-            Log.d("Synapse-AI", "Gemini:\n$aiResponse")
+            }
 
-            val command: Command = IntentParser.parse(aiResponse)
+            val results = mutableListOf<CommandResult>()
 
-            Log.d("Synapse-AI", "Command: $command")
+            for (text in commands) {
 
-            val result = engine.execute(command)
+                Log.d("Synapse-AI", "Processing: $text")
 
-            Log.d("Synapse-AI", "Result: $result")
+                val command = nlpProcessor.process(text)
 
-            result
+                Log.d("Synapse-AI", "Command: $command")
+
+                val result = engine.execute(command)
+
+                Log.d("Synapse-AI", "Result: $result")
+
+                results.add(result)
+
+            }
+
+            val success = results.all { it.success }
+
+            val message = buildString {
+
+                results.forEachIndexed { index, result ->
+
+                    append("${index + 1}. ${result.message}")
+
+                    if (index != results.lastIndex) {
+                        append("\n")
+                    }
+
+                }
+
+            }
+
+            CommandResult(
+                success = success,
+                message = message
+            )
 
         } catch (e: Exception) {
 
             Log.e(
                 "Synapse-AI",
-                "AI Error",
+                "Offline Processing Error",
                 e
             )
 
             CommandResult(
                 success = false,
-                message = e.message ?: "Unknown AI Error"
+                message = e.message ?: "Unknown error"
             )
 
         }

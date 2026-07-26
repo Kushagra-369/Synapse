@@ -16,18 +16,12 @@ class WhatsAppSkill(
 
     override val name: String = "whatsapp"
 
-    private val actions: Map<String, com.synapse.mobile.core.actions.Action> = mapOf(
-
+    private val actions = mapOf(
         "open" to OpenWhatsAppAction(gateway),
-
-        "send_message" to SendMessageAction(gateway),
-
+        "send" to SendMessageAction(gateway),
         "open_chat" to OpenChatAction(gateway),
-
         "voice_call" to VoiceCallAction(gateway),
-
         "video_call" to VideoCallAction(gateway)
-
     )
 
     override fun execute(

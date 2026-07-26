@@ -55,6 +55,7 @@ android {
 }
 
 dependencies {
+    implementation("androidx.compose.material:material-icons-extended")
     implementation(libs.retrofit)
     implementation(libs.converterGson)
     implementation(libs.okhttp)

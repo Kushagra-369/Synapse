@@ -13,7 +13,7 @@ class BrowserSkill(
     override val name = "browser"
 
     private val actions = mapOf(
-        "open_url" to OpenUrlAction(gateway)
+        "openWebsite" to OpenUrlAction(gateway)
     )
 
     override fun execute(

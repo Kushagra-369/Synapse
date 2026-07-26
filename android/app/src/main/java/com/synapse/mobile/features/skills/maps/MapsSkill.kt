@@ -16,19 +16,10 @@ class MapsSkill(
     override val name = "maps"
 
     private val actions = mapOf(
-
-        "get_current_location"
-                to GetCurrentLocationAction(gateway),
-
-        "open_maps"
-                to OpenMapsAction(gateway),
-
-        "navigate"
-                to NavigateAction(gateway),
-
-        "search_place"
-                to SearchPlaceAction(gateway)
-
+        "open" to OpenMapsAction(gateway),
+        "navigate" to NavigateAction(gateway),
+        "search_place" to SearchPlaceAction(gateway),
+        "get_current_location" to GetCurrentLocationAction(gateway)
     )
 
     override fun execute(

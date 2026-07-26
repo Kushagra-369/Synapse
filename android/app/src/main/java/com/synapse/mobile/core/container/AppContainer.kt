@@ -137,7 +137,7 @@ class AppContainer(
         )
 
         register(
-            AppsSkill(appGateway)
+            AppsSkill(appGateway,context)
         )
 
         register(

@@ -22,32 +22,24 @@ class DeviceSkill(
 
     private val actions = mapOf(
 
-        "set_brightness" to
-                SetBrightnessAction(gateway),
+        "setBrightness" to SetBrightnessAction(gateway),
 
-        "set_volume" to
-                SetVolumeAction(gateway),
+        "setVolume" to SetVolumeAction(gateway),
 
-        "set_wifi" to
-                SetWifiAction(gateway),
+        "set_wifi" to SetWifiAction(gateway),
 
-        "set_bluetooth" to
-                SetBluetoothAction(gateway),
+        "set_bluetooth" to SetBluetoothAction(gateway),
 
-        "set_rotation" to
-                SetRotationAction(gateway),
+        "set_rotation" to SetRotationAction(gateway),
 
-        "set_dnd" to
-                SetDndAction(gateway),
+        "set_dnd" to SetDndAction(gateway),
 
-        "set_hotspot" to
-                SetHotspotAction(),
+        "set_hotspot" to SetHotspotAction(),
 
-        "set_nfc" to
-                SetNfcAction(),
+        "set_nfc" to SetNfcAction(),
 
-        "get_battery" to
-                GetBatteryAction(gateway)
+        "get_battery" to GetBatteryAction(gateway),
+
 
     )
 

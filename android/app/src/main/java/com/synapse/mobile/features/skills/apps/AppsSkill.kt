@@ -5,15 +5,17 @@ import com.synapse.mobile.core.models.Command
 import com.synapse.mobile.core.models.CommandResult
 import com.synapse.mobile.features.skills.apps.actions.LaunchAppAction
 import com.synapse.mobile.features.skills.apps.gateway.AppGateway
+import android.content.Context
 
 class AppsSkill(
-    gateway: AppGateway
+    gateway: AppGateway,
+    context: Context
 ) : Skill {
 
     override val name = "apps"
 
     private val actions = mapOf(
-        "launch_app" to LaunchAppAction(gateway)
+        "open" to LaunchAppAction(gateway, context)
     )
 
     override fun execute(
