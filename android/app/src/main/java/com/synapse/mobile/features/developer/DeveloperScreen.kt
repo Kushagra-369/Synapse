@@ -1,5 +1,10 @@
 package com.synapse.mobile.features.developer
-
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -31,6 +36,22 @@ fun DeveloperScreen(
     val scope = rememberCoroutineScope()
     val processor = AIProcessor(engine)
 
+    val context = LocalContext.current
+
+    val microphonePermissionLauncher =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { granted ->
+
+            if (!granted) {
+                result = CommandResult(
+                    success = false,
+                    message = "Microphone permission denied."
+                )
+            }
+
+        }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -56,6 +77,18 @@ fun DeveloperScreen(
             modifier = Modifier.fillMaxWidth(),
             enabled = !loading,
             onClick = {
+
+                if (
+                    ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.RECORD_AUDIO
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    microphonePermissionLauncher.launch(
+                        Manifest.permission.RECORD_AUDIO
+                    )
+                    return@Button
+                }
 
                 if (prompt.isBlank()) {
                     result = CommandResult(
