@@ -17,7 +17,6 @@ class AppResolver(
      */
     fun getInstalledApps(): List<ResolvedApp> {
 
-        val intent = packageManager.getLaunchIntentForPackage("android")
 
         val launchIntent = android.content.Intent(android.content.Intent.ACTION_MAIN).apply {
             addCategory(android.content.Intent.CATEGORY_LAUNCHER)
@@ -69,6 +68,18 @@ class AppResolver(
             it.appName.lowercase(Locale.getDefault()).contains(query)
         }?.let {
             return it
+        }
+
+        apps.firstOrNull {
+
+            it.packageName
+                .lowercase(Locale.getDefault())
+                .contains(query)
+
+        }?.let {
+
+            return it
+
         }
 
         return null

@@ -14,7 +14,7 @@ object CommandBuilder {
             IntentType.OPEN_APP -> {
                 Command(
                     skill = "apps",
-                    action = "open",
+                    action = "launch_app",
                     parameters = parameters
                 )
             }
@@ -22,7 +22,7 @@ object CommandBuilder {
             IntentType.CLOSE_APP -> {
                 Command(
                     skill = "apps",
-                    action = "close",
+                    action = "close_app",
                     parameters = parameters
                 )
             }
@@ -63,6 +63,38 @@ object CommandBuilder {
                 Command(
                     skill = "whatsapp",
                     action = "send",
+                    parameters = parameters
+                )
+            }
+
+            IntentType.OPEN_WHATSAPP -> {
+                Command(
+                    skill = "whatsapp",
+                    action = "open",
+                    parameters = parameters
+                )
+            }
+
+            IntentType.OPEN_WHATSAPP_CHAT -> {
+                Command(
+                    skill = "whatsapp",
+                    action = "open_chat",
+                    parameters = parameters
+                )
+            }
+
+            IntentType.WHATSAPP_VOICE_CALL -> {
+                Command(
+                    skill = "whatsapp",
+                    action = "voice_call",
+                    parameters = parameters
+                )
+            }
+
+            IntentType.WHATSAPP_VIDEO_CALL -> {
+                Command(
+                    skill = "whatsapp",
+                    action = "video_call",
                     parameters = parameters
                 )
             }

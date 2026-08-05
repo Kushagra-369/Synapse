@@ -21,6 +21,7 @@ import com.synapse.mobile.features.ai.AIProcessor
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
+import com.synapse.mobile.features.nlp.NLPProcessor
 import com.synapse.mobile.features.voice.*
 
 @Composable
@@ -39,12 +40,11 @@ fun DeveloperScreen(
 
     val ttsManager = remember { TextToSpeechManager(appContext) }
 
-
     val voiceController = remember {
         VoiceController(
             speechRecognizerManager = SpeechRecognizerManager(appContext),
             voiceProcessor = VoiceProcessor(
-                nlpProcessor = com.synapse.mobile.features.nlp.NLPProcessor(),
+                nlpProcessor = NLPProcessor(),
                 engine = engine,
                 textToSpeechManager = ttsManager
             )
@@ -66,22 +66,21 @@ fun DeveloperScreen(
     // Function to process command with debug info
     suspend fun processWithDebug(input: String): Pair<CommandResult?, DebugInfo?> {
         return try {
-            val processor = AIProcessor(engine)
-            // We need to get the raw command before execution to show debug info.
-            // Assuming AIProcessor has a method to get the command or we can simulate.
-            // Since we don't have the exact AIProcessor implementation, we'll call process and then
-            // also get the command from the engine's last command? Instead, we'll use the NLP pipeline directly.
-            // For simplicity, we'll just call processor.process and then we'll try to extract info from the engine?
-            // Better: Let's create a separate function in AIProcessor to return the command.
-            // But we don't have that. We'll just show the result and basic info.
-            // To keep it simple, we'll just show the result and the input.
-            val commandResult = processor.process(input)
-            // Try to get the last command from the engine if available.
+            val nlpProcessor = NLPProcessor()
+            val command = nlpProcessor.process(input)
+
+            android.util.Log.d("SYNAPSE", "🔍 Command: ${command.skill}/${command.action}")
+            android.util.Log.d("SYNAPSE", "📦 Parameters: ${command.parameters}")
+
+            val commandResult = engine.execute(command)
+
+            android.util.Log.d("SYNAPSE", "✅ Result: ${commandResult.success} - ${commandResult.message}")
+
             val debug = DebugInfo(
                 normalizedText = input,
-                intent = "Unknown",
-                entities = emptyMap(),
-                command = null
+                intent = command.parameters["intent"]?.toString() ?: "UNKNOWN",
+                entities = command.parameters.filterKeys { it != "intent" },
+                command = command
             )
             Pair(commandResult, debug)
         } catch (e: Exception) {
@@ -140,18 +139,9 @@ fun DeveloperScreen(
 
                 scope.launch {
                     loading = true
-
-                    val command = com.synapse.mobile.features.nlp.NLPProcessor().process(prompt)
-
-                    android.util.Log.d("SYNAPSE", "COMMAND = $command")
-
-                    val commandResult = engine.execute(command)
-
-                    android.util.Log.d("SYNAPSE", "RESULT = $commandResult")
-
+                    val (commandResult, debug) = processWithDebug(prompt)
                     result = commandResult
-                    debugInfo = null
-
+                    debugInfo = debug
                     loading = false
                 }
             }
@@ -176,8 +166,7 @@ fun DeveloperScreen(
                     onResult = { commandResult ->
                         loading = false
                         result = commandResult
-                        // Try to get debug info from voice processor? Not easily.
-                        debugInfo = null // reset for voice
+                        debugInfo = null
                     },
                     onError = {
                         result = CommandResult(false, it)
@@ -204,7 +193,10 @@ fun DeveloperScreen(
 
         // Debug Card
         if (debugInfo != null) {
-            Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+            ) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text("🔍 Debug Info", style = MaterialTheme.typography.titleMedium)
                     debugInfo?.let { info ->

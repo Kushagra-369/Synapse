@@ -85,7 +85,6 @@ object Normalizer {
 
         // ----- General clean‑up -----
         "set" to "",      // removes "set" but leaves the rest (e.g., "volume" remains)
-        "to" to "",       // careful: might affect "go to" but we have "go to" as open trigger separately
         "please" to "",   // already present but safe
         "kindly" to ""    // already present
     )

@@ -1,5 +1,6 @@
 package com.synapse.mobile.features.ai
 
+import android.content.Context
 import android.util.Log
 import com.synapse.mobile.core.engine.SynapseEngine
 import com.synapse.mobile.core.models.CommandResult
@@ -7,11 +8,10 @@ import com.synapse.mobile.features.nlp.NLPProcessor
 import com.synapse.mobile.features.nlp.parser.MultiCommandParser
 
 class AIProcessor(
-
-    private val engine: SynapseEngine
-
+    context: Context
 ) {
 
+    private val engine = SynapseEngine(context)  // ← Only context needed, rest use defaults
     private val multiCommandParser = MultiCommandParser()
     private val nlpProcessor = NLPProcessor()
 
@@ -42,11 +42,11 @@ class AIProcessor(
 
                 val command = nlpProcessor.process(text)
 
-                Log.d("Synapse-AI", "Command: $command")
+                Log.d("Synapse-AI", "Command: ${command.skill}/${command.action}, params: ${command.parameters}")
 
                 val result = engine.execute(command)
 
-                Log.d("Synapse-AI", "Result: $result")
+                Log.d("Synapse-AI", "Result: ${result.success} - ${result.message}")
 
                 results.add(result)
 
@@ -90,4 +90,8 @@ class AIProcessor(
 
     }
 
+    /**
+     * Get last command for debugging
+     */
+    fun getLastCommand() = engine.lastCommand
 }

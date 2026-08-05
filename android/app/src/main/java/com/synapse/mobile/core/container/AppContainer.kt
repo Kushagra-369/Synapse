@@ -91,7 +91,8 @@ class AppContainer(
 
         register(
             WhatsAppSkill(
-                whatsAppGateway
+                whatsAppGateway,
+                context
             )
         )
 
@@ -129,7 +130,7 @@ class AppContainer(
         )
 
         register(
-            PhoneSkill(phoneGateway)
+            PhoneSkill(phoneGateway,context)
         )
 
         register(

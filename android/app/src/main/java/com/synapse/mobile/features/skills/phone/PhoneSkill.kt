@@ -6,14 +6,20 @@ import com.synapse.mobile.core.models.CommandResult
 import com.synapse.mobile.features.skills.phone.actions.MakeCallAction
 import com.synapse.mobile.features.skills.phone.gateway.PhoneGateway
 
+import android.content.Context
+
 class PhoneSkill(
-    gateway: PhoneGateway
+    private val gateway: PhoneGateway,
+    private val context: Context
 ) : Skill {
 
     override val name = "phone"
 
     private val actions = mapOf(
-        "call" to MakeCallAction(gateway)
+        "call" to MakeCallAction(
+            gateway,
+            context
+        )
     )
 
     override fun execute(command: Command): CommandResult {

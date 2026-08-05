@@ -5,6 +5,7 @@ package com.synapse.mobile.features.nlp
  *
  * - app (from [AliasRepository.appAliases])
  * - contact (after call/dial triggers, with time phrases removed)
+ * - message (text content for WhatsApp, SMS, etc.)
  * - website (from local aliases or domain detection)
  * - number (first integer)
  * - time (via [TimeExtractor])
@@ -16,14 +17,11 @@ package com.synapse.mobile.features.nlp
  * - url (e.g., "https://example.com", "www.example.com")
  *
  * All extractions are case‑insensitive and robust against common variations.
- *
- * Note: If you want to centralise website aliases, move the [websiteAliases] map
- * to [AliasRepository] and replace the local usage with it.
  */
 @Suppress("UNCHECKED_CAST")
 object EntityExtractor {
 
-    // Local website aliases (move to AliasRepository.websiteAliases if needed)
+    // Local website aliases
     private val websiteAliases = mapOf(
         "youtube" to listOf("youtube", "yt"),
         "google" to listOf("google", "gmail", "google drive"),
@@ -42,34 +40,98 @@ object EntityExtractor {
         "telegram" to listOf("telegram", "tg")
     )
 
+    // ----------------------------------------------------------------------
+    // Public API
+    // ----------------------------------------------------------------------
+
     /**
      * Extracts all known entities from the input text.
      *
      * @param text natural language input
      * @return a mutable map with entity keys (String) and values (String, Int, or TimeEntity)
      */
-    fun extract(text: String): MutableMap<String, Any> {
+    fun extract(
+        text: String,
+        intent: IntentType
+    ): MutableMap<String, Any>{
         val params = mutableMapOf<String, Any>()
 
-        // Core entities
-        extractApp(text)?.let { params["app"] = it }
-        extractContact(text)?.let { params["contact"] = it }
-        extractWebsite(text)?.let { params["website"] = it }
-        if (!params.containsKey("website")) {
-            extractApp(text)?.let {
-                params["app"] = it
-            }
-        }
-        extractNumber(text)?.let { params["number"] = it }
-        extractTime(text)?.let { params["time"] = it }
+        when (intent) {
 
-        // New entities
-        extractVolume(text)?.let { params["volume"] = it }
-        extractBrightness(text)?.let { params["brightness"] = it }
-        extractPercentage(text)?.let { params["percentage"] = it }
-        extractPhoneNumber(text)?.let { params["phoneNumber"] = it }
-        extractEmail(text)?.let { params["email"] = it }
-        extractUrl(text)?.let { params["url"] = it }
+            IntentType.OPEN_APP -> {
+                extractApp(text)?.let {
+                    params["app"] = it
+                }
+            }
+
+            IntentType.CLOSE_APP -> {
+                extractApp(text)?.let {
+                    params["app"] = it
+                }
+            }
+
+            IntentType.OPEN_WEBSITE -> {
+                extractWebsite(text)?.let {
+                    params["website"] = it
+                }
+            }
+
+            IntentType.OPEN_YOUTUBE -> {
+                extractWebsite(text)?.let {
+                    params["website"] = it
+                }
+            }
+
+            IntentType.OPEN_MAPS -> {
+                extractWebsite(text)?.let {
+                    params["location"] = it
+                }
+            }
+
+            IntentType.CALL_CONTACT -> {
+
+                val contact = extractContact(text)
+
+                contact?.let {
+                    params["contact"] = it
+                }
+            }
+
+            IntentType.SEND_WHATSAPP -> {
+
+                val contact = extractContact(text)
+
+                contact?.let {
+                    params["contact"] = it
+                }
+
+                extractMessage(text, contact)?.let {
+                    params["message"] = it
+                }
+            }
+
+            IntentType.SET_ALARM,
+            IntentType.SET_TIMER -> {
+
+                extractTime(text)?.let {
+                    params["time"] = it
+                }
+            }
+
+            IntentType.SET_VOLUME -> {
+                extractVolume(text)?.let {
+                    params["volume"] = it
+                }
+            }
+
+            IntentType.SET_BRIGHTNESS -> {
+                extractBrightness(text)?.let {
+                    params["brightness"] = it
+                }
+            }
+
+            else -> {}
+        }
 
         return params
     }
@@ -89,61 +151,154 @@ object EntityExtractor {
     }
 
     // ----------------------------------------------------------------------
-    // Contact extraction (with time removal)
+    // Contact extraction (Enhanced with Hinglish support)
     // ----------------------------------------------------------------------
 
     private fun extractContact(text: String): String? {
-        val trigger = AliasRepository.callAliases.firstOrNull {
-            text.contains(it, ignoreCase = true)
-        } ?: return null
 
-        val afterTrigger = text.substringAfter(trigger, "").trim()
-        if (afterTrigger.isEmpty()) return null
+        val lower = text.lowercase().trim()
 
-        // Remove any time expression from the substring to avoid contamination.
-        val timeEntity = TimeExtractor.extract(afterTrigger)
-        val cleaned = if (timeEntity.type != TimeType.NONE) {
-            // Remove the raw matched time text from the string
-            afterTrigger.replace(timeEntity.rawText, "").trim()
-        } else {
-            afterTrigger
-        }
+        // -------------------------------------------------
+        // 1. Call Rahul
+        // -------------------------------------------------
 
-        // Now extract a name from the cleaned text.
-        // Name pattern: letters, spaces, hyphens, apostrophes (both curly and straight), dots.
-        val nameRegex = Regex("^[\\p{L}\\s'’.-]+")
-        val name = nameRegex.find(cleaned)?.value?.trim()
-        return name?.takeIf { it.isNotEmpty() }
+        Regex("""(?:call|dial|phone)\s+([a-zA-Z]+)""")
+            .find(lower)
+            ?.groupValues?.get(1)
+            ?.let { return it }
+
+        // -------------------------------------------------
+        // 2. Voice call Rahul
+        // -------------------------------------------------
+
+        Regex("""(?:voice|video)\s+call\s+([a-zA-Z]+)""")
+            .find(lower)
+            ?.groupValues?.get(1)
+            ?.let { return it }
+
+        // -------------------------------------------------
+        // 3. WhatsApp Rahul
+        // -------------------------------------------------
+
+        Regex("""(?:whatsapp|wa)\s+([a-zA-Z]+)""")
+            .find(lower)
+            ?.groupValues?.get(1)
+            ?.let { return it }
+
+        // -------------------------------------------------
+        // 4. send hello to Rahul
+        // -------------------------------------------------
+
+        Regex("""(?:send|message|msg|say)\s+.+?\s+(?:to)\s+([a-zA-Z]+)""")
+            .find(lower)
+            ?.groupValues?.get(1)
+            ?.let { return it }
+
+        // -------------------------------------------------
+        // 5. Rahul ko hello bhej
+        // -------------------------------------------------
+
+        Regex("""^([a-zA-Z]+)\s+ko\b""")
+            .find(lower)
+            ?.groupValues?.get(1)
+            ?.let { return it }
+
+        // -------------------------------------------------
+        // 6. hello Rahul ko bhej
+        // -------------------------------------------------
+
+        Regex(""".+\s+([a-zA-Z]+)\s+ko\s+(?:bhej|bhejo|send|msg|message)""")
+            .find(lower)
+            ?.groupValues?.get(1)
+            ?.let { return it }
+
+        return null
     }
 
     // ----------------------------------------------------------------------
-    // Website extraction (using local aliases + domain detection)
+    // Message extraction (Enhanced with Hinglish support)
+    // ----------------------------------------------------------------------
+
+    private fun extractMessage(
+        text: String,
+        contact: String?
+    ): String? {
+
+        val lower = text.lowercase().trim()
+
+        // ---------------------------------------------------
+        // 1. send hello to vinay
+        // ---------------------------------------------------
+
+        Regex("""(?:send|message|msg|say)\s+(.+?)\s+to\s+[a-zA-Z]+""")
+            .find(lower)
+            ?.groupValues?.get(1)
+            ?.trim()
+            ?.let { return it }
+
+        // ---------------------------------------------------
+        // 2. vinay ko hello bhej
+        // ---------------------------------------------------
+
+        Regex("""[a-zA-Z]+\s+ko\s+(.+?)\s+(?:bhej|bhejo|send|message|msg)""")
+            .find(lower)
+            ?.groupValues?.get(1)
+            ?.trim()
+            ?.let { return it }
+
+        // ---------------------------------------------------
+        // 3. hello vinay ko bhej
+        // ---------------------------------------------------
+
+        if (contact != null) {
+
+            val escaped = Regex.escape(contact.lowercase())
+
+            Regex("""(.+?)\s+$escaped\s+ko\s+(?:bhej|bhejo|send|message|msg)""")
+                .find(lower)
+                ?.groupValues?.get(1)
+                ?.trim()
+                ?.let { return it }
+        }
+
+        // ---------------------------------------------------
+        // 4. whatsapp vinay hello
+        // ---------------------------------------------------
+
+        Regex("""(?:whatsapp|wa)\s+[a-zA-Z]+\s+(.+)""")
+            .find(lower)
+            ?.groupValues?.get(1)
+            ?.trim()
+            ?.let { return it }
+
+        // ---------------------------------------------------
+        // 5. message vinay hello
+        // ---------------------------------------------------
+
+        Regex("""(?:message|msg|text)\s+[a-zA-Z]+\s+(.+)""")
+            .find(lower)
+            ?.groupValues?.get(1)
+            ?.trim()
+            ?.let { return it }
+
+        return null
+    }
+
+    // ----------------------------------------------------------------------
+    // Website extraction
     // ----------------------------------------------------------------------
 
     private fun extractWebsite(text: String): String? {
         val lower = text.lowercase()
 
-        // 1. Check known aliases from local map.
+        // 1. Check known aliases
         for ((site, aliases) in websiteAliases) {
             if (aliases.any { lower.contains(it.lowercase()) }) {
                 return site
             }
         }
 
-        // 2. Detect "open" / "go to" followed by a word.
-        val openTriggers = listOf("open", "go to", "launch", "visit")
-        for (trigger in openTriggers) {
-            if (lower.contains(trigger)) {
-                val after = text.substringAfter(trigger, "").trim()
-                val wordRegex = Regex("^[\\w.-]+")
-                val domain = wordRegex.find(after)?.value
-                if (!domain.isNullOrBlank()) {
-                    return domain.replace(Regex("\\.(com|org|net|co|in|io)$"), "")
-                }
-            }
-        }
-
-        // 3. Detect domain‑like pattern (e.g., "youtube.com").
+        // 2. Detect domain pattern (e.g., "youtube.com")
         val domainRegex = Regex("""\b([\w-]+)\.(com|org|net|co|in|io)\b""")
         val match = domainRegex.find(text)
         if (match != null) {
@@ -176,7 +331,6 @@ object EntityExtractor {
     // ----------------------------------------------------------------------
 
     private fun extractVolume(text: String): Int? {
-        // Patterns: "volume 5", "set volume to 70", "volume up" (ignored)
         val regex = Regex("""volume\s*(?:to\s*)?(\d+)""", RegexOption.IGNORE_CASE)
         return regex.find(text)?.groupValues?.get(1)?.toIntOrNull()
     }
@@ -196,11 +350,10 @@ object EntityExtractor {
     }
 
     // ----------------------------------------------------------------------
-    // Phone number (simple)
+    // Phone number
     // ----------------------------------------------------------------------
 
     private fun extractPhoneNumber(text: String): String? {
-        // Supports: +91 9876543210, 987-654-3210, 9876543210
         val regex = Regex("""(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}""")
         return regex.find(text)?.value?.trim()
     }

@@ -139,7 +139,10 @@ object AliasRepository {
     val callAliases = listOf(
         "call",
         "dial",
-        "phone"
+        "phone",
+        "phone laga",
+        "call laga",
+        "baat kara",
     )
 
     // ---------------------------
@@ -168,8 +171,13 @@ object AliasRepository {
     // ---------------------------
 
     val whatsappAliases = listOf(
+
         "whatsapp",
-        "wa"
+        "wa",
+        "whats app",
+        "watsapp",
+        "wp"
+
     )
 
     // ---------------------------
@@ -182,7 +190,9 @@ object AliasRepository {
         "start",
         "khol",
         "khol do",
-        "kholo"
+        "kholo",
+        "kholna",
+        "open kar",
     )
 
     // ---------------------------
