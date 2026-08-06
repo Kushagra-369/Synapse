@@ -103,11 +103,43 @@ class AndroidWhatsAppGateway(
 
 
     override fun voiceCall(phone: String): Boolean {
-        return false
+
+        return try {
+
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://wa.me/$phone")
+            ).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+
+            context.startActivity(intent)
+
+            true
+
+        } catch (e: Exception) {
+            false
+        }
     }
 
     override fun videoCall(phone: String): Boolean {
-        return false
+
+        return try {
+
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://wa.me/$phone")
+            ).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+
+            context.startActivity(intent)
+
+            true
+
+        } catch (e: Exception) {
+            false
+        }
     }
 
 }

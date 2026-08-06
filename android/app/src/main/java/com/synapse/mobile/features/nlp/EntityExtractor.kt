@@ -118,6 +118,17 @@ object EntityExtractor {
                 }
             }
 
+            IntentType.CREATE_CALENDAR_EVENT -> {
+
+                extractTime(text)?.let {
+                    params["time"] = it
+                }
+
+                extractEventTitle(text)?.let {
+                    params["title"] = it
+                }
+            }
+
             IntentType.SET_VOLUME -> {
                 extractVolume(text)?.let {
                     params["volume"] = it
@@ -158,57 +169,36 @@ object EntityExtractor {
 
         val lower = text.lowercase().trim()
 
-        // -------------------------------------------------
-        // 1. Call Rahul
-        // -------------------------------------------------
+        // remove words which are NOT contact names
+        val cleaned = lower
+            .replace("whatsapp", "")
+            .replace("voice call", "")
+            .replace("video call", "")
+            .replace("voice", "")
+            .replace("video", "")
+            .trim()
 
+        // call vinay
         Regex("""(?:call|dial|phone)\s+([a-zA-Z]+)""")
-            .find(lower)
+            .find(cleaned)
             ?.groupValues?.get(1)
             ?.let { return it }
 
-        // -------------------------------------------------
-        // 2. Voice call Rahul
-        // -------------------------------------------------
-
-        Regex("""(?:voice|video)\s+call\s+([a-zA-Z]+)""")
-            .find(lower)
+        // send hello to vinay
+        Regex("""(?:send|message|msg|say)\s+.+?\s+to\s+([a-zA-Z]+)""")
+            .find(cleaned)
             ?.groupValues?.get(1)
             ?.let { return it }
 
-        // -------------------------------------------------
-        // 3. WhatsApp Rahul
-        // -------------------------------------------------
-
-        Regex("""(?:whatsapp|wa)\s+([a-zA-Z]+)""")
-            .find(lower)
-            ?.groupValues?.get(1)
-            ?.let { return it }
-
-        // -------------------------------------------------
-        // 4. send hello to Rahul
-        // -------------------------------------------------
-
-        Regex("""(?:send|message|msg|say)\s+.+?\s+(?:to)\s+([a-zA-Z]+)""")
-            .find(lower)
-            ?.groupValues?.get(1)
-            ?.let { return it }
-
-        // -------------------------------------------------
-        // 5. Rahul ko hello bhej
-        // -------------------------------------------------
-
+        // vinay ko hello bhej
         Regex("""^([a-zA-Z]+)\s+ko\b""")
-            .find(lower)
+            .find(cleaned)
             ?.groupValues?.get(1)
             ?.let { return it }
 
-        // -------------------------------------------------
-        // 6. hello Rahul ko bhej
-        // -------------------------------------------------
-
+        // hello vinay ko bhej
         Regex(""".+\s+([a-zA-Z]+)\s+ko\s+(?:bhej|bhejo|send|msg|message)""")
-            .find(lower)
+            .find(cleaned)
             ?.groupValues?.get(1)
             ?.let { return it }
 
@@ -367,9 +357,44 @@ object EntityExtractor {
         return regex.find(text)?.value
     }
 
+    private fun extractEventTitle(text: String): String? {
+
+        var title = text.lowercase()
+
+        title = title
+            .replace("calendar me add kar do", "")
+            .replace("calendar me add karo", "")
+            .replace("calendar", "")
+            .replace("add event", "")
+            .replace("create event", "")
+            .replace("meeting", "meeting")
+            .replace("remind me", "")
+            .replace("reminder", "")
+            .replace("kal", "")
+            .replace("aaj", "")
+            .replace("tomorrow", "")
+            .replace("today", "")
+
+        // remove time expressions
+        title = title.replace(
+            Regex("""\d{1,2}(:\d{2})?\s*(am|pm|baje)?"""),
+            ""
+        )
+
+        title = title.trim()
+
+        return if (title.isBlank())
+            "Event"
+        else
+            title.replaceFirstChar {
+                it.uppercase()
+            }
+    }
+
     // ----------------------------------------------------------------------
     // URL
     // ----------------------------------------------------------------------
+
 
     private fun extractUrl(text: String): String? {
         val regex = Regex("""https?://[^\s]+|www\.[^\s]+""", RegexOption.IGNORE_CASE)

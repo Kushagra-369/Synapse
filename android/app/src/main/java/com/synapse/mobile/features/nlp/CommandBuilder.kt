@@ -123,6 +123,14 @@ object CommandBuilder {
                 )
             }
 
+            IntentType.CREATE_CALENDAR_EVENT -> {
+                Command(
+                    skill = "calendar",
+                    action = "create_event",
+                    parameters = parameters
+                )
+            }
+
             IntentType.FLASHLIGHT_ON -> {
                 Command(
                     skill = "device",

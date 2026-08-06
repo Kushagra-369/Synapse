@@ -15,6 +15,7 @@ enum class IntentType {
     FLASHLIGHT_OFF,
     SET_BRIGHTNESS,
     SET_VOLUME,
+    CREATE_CALENDAR_EVENT,
     UNKNOWN,
 
     OPEN_WHATSAPP,
@@ -43,6 +44,7 @@ object IntentDetector {
             isFlashlightOff(lower) -> IntentType.FLASHLIGHT_OFF
             isBrightness(lower) -> IntentType.SET_BRIGHTNESS
             isVolume(lower) -> IntentType.SET_VOLUME
+            isCalendar(lower) -> IntentType.CREATE_CALENDAR_EVENT
             isWebsite(lower) -> IntentType.OPEN_WEBSITE
             isOpen(lower) -> IntentType.OPEN_APP
             isClose(lower) -> IntentType.CLOSE_APP
@@ -90,17 +92,18 @@ object IntentDetector {
 
     private fun isWhatsappSend(text: String): Boolean {
 
-        return containsAny(text, AliasRepository.whatsappAliases) ||
-
-                text.contains("bhej") ||
-
-                text.contains("bhejo") ||
-
-                text.contains("msg") ||
-
-                text.contains("message") ||
-
-                text.contains("send")
+        return (
+                containsAny(text, AliasRepository.whatsappAliases) ||
+                        text.contains("bhej") ||
+                        text.contains("bhejo") ||
+                        text.contains("msg") ||
+                        text.contains("message") ||
+                        text.contains("send")
+                ) &&
+                !isWhatsappVoiceCall(text) &&
+                !isWhatsappVideoCall(text) &&
+                !isWhatsappChat(text) &&
+                !isWhatsappOpen(text)
     }
 
     private fun isWhatsappChat(text: String): Boolean {
@@ -109,15 +112,19 @@ object IntentDetector {
     }
 
     private fun isWhatsappVoiceCall(text: String): Boolean {
+
         return containsAny(text, AliasRepository.whatsappAliases) &&
-                text.contains("voice")
+                (
+                        text.contains("voice call") ||
+                                text.contains("audio call")
+                        )
     }
 
     private fun isWhatsappVideoCall(text: String): Boolean {
-        return containsAny(text, AliasRepository.whatsappAliases) &&
-                text.contains("video")
-    }
 
+        return containsAny(text, AliasRepository.whatsappAliases) &&
+                text.contains("video call")
+    }
     private fun isMaps(text: String): Boolean {
         return containsAny(text, AliasRepository.mapsAliases)
     }
@@ -152,4 +159,19 @@ object IntentDetector {
     private fun isClose(text: String): Boolean {
         return containsAny(text, AliasRepository.closeAliases)
     }
+}
+private fun isCalendar(text: String): Boolean {
+
+    return text.contains("calendar") ||
+            text.contains("event") ||
+            text.contains("meeting") ||
+            text.contains("appointment") ||
+            text.contains("birthday") ||
+            text.contains("schedule") ||
+            text.contains("reminder") ||
+            text.contains("remind") ||
+            text.contains("tomorrow") ||
+            text.contains("today") ||
+            text.contains("kal") ||
+            text.contains("aaj")
 }

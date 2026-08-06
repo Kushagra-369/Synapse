@@ -13,34 +13,59 @@ class CreateEventAction(
 
     override fun execute(command: Command): CommandResult {
 
-        val title = command.parameters["title"]
-            ?.toString()
-            ?: return CommandResult(
-                success = false,
-                message = "Missing parameter: title"
-            )
+        val title =
+            command.parameters["title"]?.toString()
+                ?: "Event"
 
-        val startTime = command.parameters["startTime"]
-            ?.toString()
-            ?.toLongOrNull()
-            ?: return CommandResult(
-                success = false,
-                message = "Missing parameter: startTime"
-            )
+        val time =
+            command.parameters["time"]
+                    as? com.synapse.mobile.features.nlp.TimeEntity
+                ?: return CommandResult(
+                    false,
+                    "Time missing."
+                )
 
-        val endTime = command.parameters["endTime"]
-            ?.toString()
-            ?.toLongOrNull()
-            ?: return CommandResult(
-                success = false,
-                message = "Missing parameter: endTime"
-            )
+        val calendar = java.util.Calendar.getInstance()
 
-        val success = gateway.createEvent(
-            title,
-            startTime,
-            endTime
+        calendar.add(
+            java.util.Calendar.DAY_OF_YEAR,
+            time.dayOffset
         )
+
+        time.hour?.let {
+            calendar.set(
+                java.util.Calendar.HOUR_OF_DAY,
+                it
+            )
+        }
+
+        time.minute?.let {
+            calendar.set(
+                java.util.Calendar.MINUTE,
+                it
+            )
+        }
+
+        calendar.set(
+            java.util.Calendar.SECOND,
+            0
+        )
+
+        val startTime = calendar.timeInMillis
+
+        calendar.add(
+            java.util.Calendar.HOUR,
+            1
+        )
+
+        val endTime = calendar.timeInMillis
+
+        val success =
+            gateway.createEvent(
+                title,
+                startTime,
+                endTime
+            )
 
         return CommandResult(
             success = success,

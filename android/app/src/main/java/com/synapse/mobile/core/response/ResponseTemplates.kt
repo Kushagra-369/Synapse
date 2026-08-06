@@ -7,7 +7,11 @@ object ResponseTemplates {
 
     const val CALLING_CONTACT = "Calling %s..."
     const val WHATSAPP = "Opening WhatsApp chat with %s..."
+    const val CALENDAR_EVENT_CREATED =
+        "Calendar event \"%s\" created successfully."
 
+    const val CALENDAR_EVENT_FAILED =
+        "Unable to create calendar event."
     const val OPENING_WEBSITE = "Opening %s..."
     const val OPENING_YOUTUBE = "Opening YouTube..."
     const val OPENING_MAPS = "Opening Maps..."

@@ -105,6 +105,18 @@ object ResponseGenerator {
                     ResponseTemplates.UNKNOWN_COMMAND
             }
 
+            "calendar" -> {
+
+                val title =
+                    params["title"]?.toString() ?: "event"
+
+                if (success)
+                    ResponseTemplates.CALENDAR_EVENT_CREATED.format(title)
+                else
+                    ResponseTemplates.CALENDAR_EVENT_FAILED
+
+            }
+
             "device" -> {
 
                 if (!success) {

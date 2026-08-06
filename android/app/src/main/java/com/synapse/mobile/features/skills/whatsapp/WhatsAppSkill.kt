@@ -35,7 +35,10 @@ class WhatsAppSkill(
             context
         ),
 
-        "video_call" to VideoCallAction(gateway)
+        "video_call" to VideoCallAction(
+            gateway,
+            context
+        )
     )
 
     override fun execute(
