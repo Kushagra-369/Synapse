@@ -5,7 +5,8 @@ interface CalendarGateway {
     fun createEvent(
         title: String,
         startTime: Long,
-        endTime: Long
+        endTime: Long,
+        allDay: Boolean = false
     ): Boolean
 
 }

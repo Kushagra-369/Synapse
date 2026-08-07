@@ -120,6 +120,10 @@ object EntityExtractor {
 
             IntentType.CREATE_CALENDAR_EVENT -> {
 
+                extractDate(text)?.let {
+                    params["date"] = it
+                }
+
                 extractTime(text)?.let {
                     params["time"] = it
                 }
@@ -316,6 +320,9 @@ object EntityExtractor {
         return if (entity.type != TimeType.NONE) entity else null
     }
 
+    private fun extractDate(text: String): DateEntity? {
+        return DateExtractor.extract(text)
+    }
     // ----------------------------------------------------------------------
     // Volume and Brightness
     // ----------------------------------------------------------------------

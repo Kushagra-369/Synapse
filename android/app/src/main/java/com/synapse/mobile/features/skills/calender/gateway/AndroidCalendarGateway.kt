@@ -11,7 +11,8 @@ class AndroidCalendarGateway(
     override fun createEvent(
         title: String,
         startTime: Long,
-        endTime: Long
+        endTime: Long,
+        allDay: Boolean
     ): Boolean {
 
         return try {
@@ -78,6 +79,20 @@ class AndroidCalendarGateway(
                     CalendarContract.Events.EVENT_TIMEZONE,
                     java.util.TimeZone.getDefault().id
                 )
+
+                put(
+                    CalendarContract.Events.ALL_DAY,
+                    allDay
+                )
+
+                if (allDay) {
+
+                    put(
+                        CalendarContract.Events.RRULE,
+                        "FREQ=YEARLY"
+                    )
+
+                }
 
             }
 

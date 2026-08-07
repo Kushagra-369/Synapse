@@ -20,29 +20,58 @@ class CreateEventAction(
         val time =
             command.parameters["time"]
                     as? com.synapse.mobile.features.nlp.TimeEntity
-                ?: return CommandResult(
-                    false,
-                    "Time missing."
-                )
+
+        val date =
+            command.parameters["date"]
+                    as? com.synapse.mobile.features.nlp.DateEntity
 
         val calendar = java.util.Calendar.getInstance()
 
-        calendar.add(
-            java.util.Calendar.DAY_OF_YEAR,
-            time.dayOffset
-        )
+        if (time != null) {
 
-        time.hour?.let {
+            calendar.add(
+                java.util.Calendar.DAY_OF_YEAR,
+                time.dayOffset
+            )
+
             calendar.set(
                 java.util.Calendar.HOUR_OF_DAY,
-                it
+                time.hour ?: 9
             )
-        }
 
-        time.minute?.let {
             calendar.set(
                 java.util.Calendar.MINUTE,
-                it
+                time.minute ?: 0
+            )
+
+        } else {
+
+            if (date != null) {
+
+                calendar.set(
+                    java.util.Calendar.YEAR,
+                    date.year
+                )
+
+                calendar.set(
+                    java.util.Calendar.MONTH,
+                    date.month - 1
+                )
+
+                calendar.set(
+                    java.util.Calendar.DAY_OF_MONTH,
+                    date.day
+                )
+            }
+
+            calendar.set(
+                java.util.Calendar.HOUR_OF_DAY,
+                0
+            )
+
+            calendar.set(
+                java.util.Calendar.MINUTE,
+                0
             )
         }
 
@@ -53,10 +82,21 @@ class CreateEventAction(
 
         val startTime = calendar.timeInMillis
 
-        calendar.add(
-            java.util.Calendar.HOUR,
-            1
-        )
+        if (time != null) {
+
+            calendar.add(
+                java.util.Calendar.HOUR,
+                1
+            )
+
+        } else {
+
+            calendar.add(
+                java.util.Calendar.DAY_OF_YEAR,
+                1
+            )
+
+        }
 
         val endTime = calendar.timeInMillis
 
@@ -64,7 +104,8 @@ class CreateEventAction(
             gateway.createEvent(
                 title,
                 startTime,
-                endTime
+                endTime,
+                allDay = (time == null)
             )
 
         return CommandResult(
