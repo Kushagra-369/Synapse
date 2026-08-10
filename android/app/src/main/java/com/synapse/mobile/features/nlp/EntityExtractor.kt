@@ -110,11 +110,47 @@ object EntityExtractor {
                 }
             }
 
-            IntentType.SET_ALARM,
-            IntentType.SET_TIMER -> {
+            IntentType.SET_ALARM -> {
 
                 extractTime(text)?.let {
                     params["time"] = it
+                }
+            }
+
+            IntentType.SET_TIMER -> {
+
+                extractTime(text)?.let { time ->
+
+                    params["time"] = time
+
+                    if (time.type == TimeType.DURATION) {
+
+                        val duration = time.duration ?: 0
+
+                        val seconds = when (time.durationUnit?.lowercase()) {
+
+                            "seconds",
+                            "second",
+                            "sec",
+                            "secs" -> duration
+
+                            "minutes",
+                            "minute",
+                            "min",
+                            "mins" -> duration * 60
+
+                            "hours",
+                            "hour",
+                            "hr",
+                            "hrs" -> duration * 60 * 60
+
+                            else -> 0
+                        }
+
+                        if (seconds > 0) {
+                            params["seconds"] = seconds
+                        }
+                    }
                 }
             }
 

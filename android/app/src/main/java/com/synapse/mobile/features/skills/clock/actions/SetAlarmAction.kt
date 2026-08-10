@@ -13,32 +13,45 @@ class SetAlarmAction(
 
     override fun execute(command: Command): CommandResult {
 
-        val time = command.parameters["time"]?.toString()
-            ?: return CommandResult(
-                success = false,
-                message = "Missing parameter: time"
-            )
+        val time =
+            command.parameters["time"]
+                    as? com.synapse.mobile.features.nlp.TimeEntity
+                ?: return CommandResult(
+                    success = false,
+                    message = "Missing parameter: time"
+                )
 
-        val parts = time.split(":")
+        val hour =
+            time.hour
+                ?: return CommandResult(
+                    success = false,
+                    message = "Invalid time: hour missing."
+                )
 
-        if (parts.size != 2) {
+        val minute =
+            time.minute ?: 0
+
+        if (hour !in 0..23) {
             return CommandResult(
                 success = false,
-                message = "Invalid time format. Expected HH:mm"
+                message = "Invalid hour."
             )
         }
 
-        val hour = parts[0].toIntOrNull()
-        val minute = parts[1].toIntOrNull()
-
-        if (hour == null || minute == null) {
+        if (minute !in 0..59) {
             return CommandResult(
                 success = false,
-                message = "Invalid time value."
+                message = "Invalid minute."
             )
         }
-        android.util.Log.e("Synapse", "Calling gateway")
-        val success = gateway.setAlarm(hour, minute)
+
+        android.util.Log.d(
+            "Synapse",
+            "Setting alarm: %02d:%02d".format(hour, minute)
+        )
+
+        val success =
+            gateway.setAlarm(hour, minute)
 
         return CommandResult(
             success = success,

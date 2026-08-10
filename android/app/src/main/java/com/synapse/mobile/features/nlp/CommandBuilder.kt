@@ -102,7 +102,7 @@ object CommandBuilder {
             IntentType.SET_ALARM -> {
                 Command(
                     skill = "clock",
-                    action = "setAlarm",
+                    action = "set_alarm",
                     parameters = parameters
                 )
             }
@@ -110,7 +110,7 @@ object CommandBuilder {
             IntentType.SET_TIMER -> {
                 Command(
                     skill = "timer",
-                    action = "start",
+                    action = "start_timer",
                     parameters = parameters
                 )
             }

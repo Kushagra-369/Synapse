@@ -70,10 +70,7 @@ object TimePatterns {
     /**
      * Hindi minutes: 30 minute, 30 minut
      */
-    val HINDI_MINUTES = Regex(
-        """\b(\d+)\s*(minute|minut|min)\b""",
-        RegexOption.IGNORE_CASE
-    )
+
 
     /**
      * Hindi hours: 2 ghanta, 2 ghante
@@ -86,10 +83,6 @@ object TimePatterns {
     /**
      * Hindi seconds: 20 second, 20 seconde
      */
-    val HINDI_SECONDS = Regex(
-        """\b(\d+)\s*(second|seconds)\b""",
-        RegexOption.IGNORE_CASE
-    )
 
     /**
      * Today

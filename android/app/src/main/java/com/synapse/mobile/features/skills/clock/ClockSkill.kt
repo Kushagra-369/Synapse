@@ -13,7 +13,7 @@ class ClockSkill(
     override val name = "clock"
 
     private val actions = mapOf(
-        "setAlarm" to SetAlarmAction(gateway)
+        "set_alarm" to SetAlarmAction(gateway)
     )
 
     override fun execute(command: Command): CommandResult {

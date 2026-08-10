@@ -135,10 +135,8 @@ object TimeExtractor {
         TimePatterns.MINUTES,
         TimePatterns.HOURS,
         TimePatterns.SECONDS,
-        TimePatterns.HINDI_MINUTES,
         TimePatterns.HINDI_HOURS,
-        TimePatterns.HINDI_SECONDS,
-        TimePatterns.AADHA_GHANTA   // "aadha ghanta" → 30 minutes
+        TimePatterns.AADHA_GHANTA
     )
 
     private fun findAllDurations(text: String): List<DurationMatch> {
