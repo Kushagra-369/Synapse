@@ -192,15 +192,56 @@ object EntityExtractor {
     // ----------------------------------------------------------------------
 
     private fun extractApp(text: String): String? {
-        val lower = text.lowercase()
+
+        val lower = text
+            .lowercase()
+            .trim()
+
+        if (lower.isBlank()) {
+            return null
+        }
+
+        // Remove command words from the BEGINNING.
+        var cleaned = lower
+            .replaceFirst(
+                Regex(
+                    """^(open|launch|start|khol|kholo|kholna|open kar|open karo)\s+"""
+                ),
+                ""
+            )
+            .trim()
+
+        // Remove command words from the END.
+        cleaned = cleaned
+            .replaceFirst(
+                Regex(
+                    """\s+(open|launch|start|khol|kholo|kholna|open kar|open karo)$"""
+                ),
+                ""
+            )
+            .trim()
+
+        if (cleaned.isBlank()) {
+            return null
+        }
+
+        // First use known aliases.
         for ((app, aliases) in AliasRepository.appAliases) {
-            if (aliases.any { lower.contains(it.lowercase()) }) {
+
+            if (
+                aliases.any {
+                    cleaned == it.lowercase()
+                }
+            ) {
                 return app
             }
         }
-        return null
-    }
 
+        // Unknown app:
+        // return the user's actual app name.
+        // AppResolver will search installed launchable apps.
+        return cleaned
+    }
     // ----------------------------------------------------------------------
     // Contact extraction (Enhanced with Hinglish support)
     // ----------------------------------------------------------------------

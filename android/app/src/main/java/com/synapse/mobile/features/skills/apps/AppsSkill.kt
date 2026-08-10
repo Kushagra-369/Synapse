@@ -15,7 +15,7 @@ class AppsSkill(
     override val name = "apps"
 
     private val actions = mapOf(
-        "open" to LaunchAppAction(gateway, context)
+        "launch_app" to LaunchAppAction(gateway, context)
     )
 
     override fun execute(

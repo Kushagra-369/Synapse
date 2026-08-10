@@ -12,6 +12,22 @@ class AppResolver(
     private val packageManager: PackageManager =
         context.packageManager
 
+    private fun debugApps() {
+        val apps = getInstalledApps()
+
+        android.util.Log.d(
+            "APP_DEBUG",
+            "Total launchable apps = ${apps.size}"
+        )
+
+        apps.forEach {
+            android.util.Log.d(
+                "APP_DEBUG",
+                "APP = '${it.appName}' | PACKAGE = '${it.packageName}'"
+            )
+        }
+    }
+
     /**
      * Returns all launchable installed apps.
      */
@@ -49,6 +65,8 @@ class AppResolver(
     fun resolve(appName: String): ResolvedApp? {
 
         val query = appName.trim().lowercase(Locale.getDefault())
+
+        debugApps()
 
         val apps = getInstalledApps()
 
