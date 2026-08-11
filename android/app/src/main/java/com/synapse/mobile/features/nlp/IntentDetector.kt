@@ -6,6 +6,10 @@ enum class IntentType {
     OPEN_WEBSITE,
     OPEN_YOUTUBE,
     OPEN_MAPS,
+    MAPS_NAVIGATE,
+    MAPS_SEARCH,
+
+    GET_CURRENT_LOCATION,
     CALL_CONTACT,
     SEND_WHATSAPP,
     SET_ALARM,
@@ -38,6 +42,9 @@ object IntentDetector {
             isWhatsappOpen(lower) -> IntentType.OPEN_WHATSAPP
             isWhatsappSend(lower) -> IntentType.SEND_WHATSAPP
             isCall(lower) -> IntentType.CALL_CONTACT
+            isCurrentLocation(lower) -> IntentType.GET_CURRENT_LOCATION
+            isMapsNavigate(lower) -> IntentType.MAPS_NAVIGATE
+            isMapsSearch(lower) -> IntentType.MAPS_SEARCH
             isMaps(lower) -> IntentType.OPEN_MAPS
             isYoutube(lower) -> IntentType.OPEN_YOUTUBE
             isFlashlightOn(lower) -> IntentType.FLASHLIGHT_ON
@@ -56,6 +63,22 @@ object IntentDetector {
 
     private fun containsAny(text: String, aliases: List<String>): Boolean {
         return aliases.any { text.contains(it) }
+    }
+
+    private fun isCurrentLocation(text: String): Boolean {
+
+        return text.contains("current location") ||
+                text.contains("my location") ||
+                text.contains("meri location") ||
+                text.contains("mera location") ||
+                text.contains("location batao") ||
+                text.contains("location bata") ||
+                text.contains("location dikhao") ||
+                text.contains("main kahan hu") ||
+                text.contains("mai kahan hu") ||
+                text.contains("mein kahan hu") ||
+                text.contains("where am i") ||
+                text.contains("where i am")
     }
 
     private fun isWebsite(text: String): Boolean {
@@ -129,6 +152,70 @@ object IntentDetector {
         return containsAny(text, AliasRepository.mapsAliases)
     }
 
+    private fun isMapsNavigate(text: String): Boolean {
+
+        // Explicit Maps/navigation commands
+        if (
+            text.contains("rasta") ||
+            text.contains("raasta") ||
+            text.contains("route") ||
+            text.contains("direction") ||
+            text.contains("directions") ||
+            text.contains("navigate") ||
+            text.contains("navigation") ||
+            text.contains("le chalo") ||
+            text.contains("le jao") ||
+            text.contains("pahucha do") ||
+            text.contains("pahuncha do") ||
+            text.contains("kaise jana") ||
+            text.contains("kaise jaaye") ||
+            text.contains("kaise jaye")
+        ) {
+            return true
+        }
+
+        // "Delhi se Noida"
+        if (Regex("""\b.+\s+se\s+.+\b""").matches(text.trim())) {
+            return true
+        }
+
+        // "Delhi to Noida"
+        if (Regex("""\b.+\s+to\s+.+\b""").matches(text.trim())) {
+            return true
+        }
+
+        return false
+    }
+
+    private fun isMapsSearch(text: String): Boolean {
+        return (
+                text.contains("nearest") ||
+                        text.contains("near me") ||
+                        text.contains("nearby") ||
+                        text.contains("sabse paas") ||
+                        text.contains("aas paas") ||
+                        text.contains("pass me") ||
+                        text.contains("dikhao") ||
+                        text.contains("dhoondo") ||
+                        text.contains("dhundo") ||
+                        text.contains("search") ||
+                        text.contains("find")
+                ) && (
+                containsAny(text, AliasRepository.mapsAliases) ||
+                        text.contains("petrol pump") ||
+                        text.contains("petrol station") ||
+                        text.contains("hospital") ||
+                        text.contains("restaurant") ||
+                        text.contains("hotel") ||
+                        text.contains("atm") ||
+                        text.contains("pharmacy") ||
+                        text.contains("cafe") ||
+                        text.contains("coffee")
+                )
+    }
+
+
+
     private fun isYoutube(text: String): Boolean {
         // Specifically detect "youtube" or "yt" – this should come before generic open.
         return containsAny(text, listOf("youtube", "yt"))
@@ -159,19 +246,20 @@ object IntentDetector {
     private fun isClose(text: String): Boolean {
         return containsAny(text, AliasRepository.closeAliases)
     }
-}
-private fun isCalendar(text: String): Boolean {
 
-    return text.contains("calendar") ||
-            text.contains("event") ||
-            text.contains("meeting") ||
-            text.contains("appointment") ||
-            text.contains("birthday") ||
-            text.contains("schedule") ||
-            text.contains("reminder") ||
-            text.contains("remind") ||
-            text.contains("tomorrow") ||
-            text.contains("today") ||
-            text.contains("kal") ||
-            text.contains("aaj")
+    private fun isCalendar(text: String): Boolean {
+
+        return text.contains("calendar") ||
+                text.contains("event") ||
+                text.contains("meeting") ||
+                text.contains("appointment") ||
+                text.contains("birthday") ||
+                text.contains("schedule") ||
+                text.contains("reminder") ||
+                text.contains("remind") ||
+                text.contains("tomorrow") ||
+                text.contains("today") ||
+                text.contains("kal") ||
+                text.contains("aaj")
+    }
 }

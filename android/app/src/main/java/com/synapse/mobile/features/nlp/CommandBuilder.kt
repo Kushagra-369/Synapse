@@ -51,6 +51,30 @@ object CommandBuilder {
                 )
             }
 
+            IntentType.MAPS_NAVIGATE -> {
+                Command(
+                    skill = "maps",
+                    action = "navigate",
+                    parameters = parameters
+                )
+            }
+
+            IntentType.MAPS_SEARCH -> {
+                Command(
+                    skill = "maps",
+                    action = "search_place",
+                    parameters = parameters
+                )
+            }
+
+            IntentType.GET_CURRENT_LOCATION -> {
+                Command(
+                    skill = "maps",
+                    action = "get_current_location",
+                    parameters = parameters
+                )
+            }
+
             IntentType.CALL_CONTACT -> {
                 Command(
                     skill = "phone",

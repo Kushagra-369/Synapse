@@ -83,9 +83,29 @@ object EntityExtractor {
             }
 
             IntentType.OPEN_MAPS -> {
-                extractWebsite(text)?.let {
-                    params["location"] = it
+                extractMapsQuery(text)?.let {
+                    params["query"] = it
                 }
+            }
+
+            IntentType.MAPS_NAVIGATE -> {
+                extractNavigationDestination(text)?.let {
+                    params["destination"] = it
+                }
+
+                extractNavigationOrigin(text)?.let {
+                    params["origin"] = it
+                }
+            }
+
+            IntentType.MAPS_SEARCH -> {
+                extractMapsQuery(text)?.let {
+                    params["place"] = it
+                }
+            }
+
+            IntentType.GET_CURRENT_LOCATION -> {
+                // No parameters required.
             }
 
             IntentType.CALL_CONTACT -> {
@@ -379,6 +399,127 @@ object EntityExtractor {
         return null
     }
 
+    // ----------------------------------------------------------------------
+// Maps extraction
+// ----------------------------------------------------------------------
+
+    private fun extractMapsQuery(text: String): String? {
+
+        var query = text.lowercase().trim()
+
+        query = query
+            .replace("open maps", "")
+            .replace("google maps", "")
+            .replace("maps", "")
+            .replace("map", "")
+            .replace("dikhao", "")
+            .replace("dikhado", "")
+            .replace("dikhaiye", "")
+            .replace("search", "")
+            .replace("find", "")
+            .replace("nearest", "")
+            .replace("near me", "")
+            .replace("nearby", "")
+            .replace("sabse paas", "")
+            .replace("aas paas", "")
+            .replace("pass me", "")
+            .replace("dhoondo", "")
+            .replace("dhundo", "")
+            .trim()
+
+        return query.takeIf { it.isNotBlank() }
+    }
+
+    private fun extractNavigationDestination(text: String): String? {
+
+        val lower = text.lowercase().trim()
+
+        // "Delhi to Noida"
+        Regex(
+            """^(.+?)\s+to\s+(.+)$"""
+        )
+            .find(lower)
+            ?.groupValues
+            ?.get(2)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
+
+        // "Delhi se Noida"
+        Regex(
+            """^(.+?)\s+se\s+(.+?)(?:\s+(?:directions?|route|rasta|raasta))?$"""
+        )
+            .find(lower)
+            ?.groupValues
+            ?.get(2)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
+
+        // "India Gate le chalo"
+        Regex(
+            """(.+?)\s+(?:le chalo|le jao|pahucha do|pahuncha do)$"""
+        )
+            .find(lower)
+            ?.groupValues
+            ?.get(1)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
+
+        // "ghar ka rasta dikhao"
+        Regex(
+            """(.+?)\s+(?:ka|ki|ke)\s+(?:rasta|raasta|route|directions?)"""
+        )
+            .find(lower)
+            ?.groupValues
+            ?.get(1)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
+
+        // "directions to India Gate"
+        Regex(
+            """(?:directions?|route|navigate)\s+(?:to|for)\s+(.+)"""
+        )
+            .find(lower)
+            ?.groupValues
+            ?.get(1)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
+
+        return null
+    }
+
+    private fun extractNavigationOrigin(text: String): String? {
+
+        val lower = text.lowercase().trim()
+
+        // "Delhi to Noida"
+        Regex(
+            """^(.+?)\s+to\s+(.+)$"""
+        )
+            .find(lower)
+            ?.groupValues
+            ?.get(1)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
+
+        // "Delhi se Noida"
+        Regex(
+            """^(.+?)\s+se\s+(.+?)(?:\s+(?:directions?|route|rasta|raasta))?$"""
+        )
+            .find(lower)
+            ?.groupValues
+            ?.get(1)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
+
+        return null
+    }
     // ----------------------------------------------------------------------
     // Number extraction
     // ----------------------------------------------------------------------

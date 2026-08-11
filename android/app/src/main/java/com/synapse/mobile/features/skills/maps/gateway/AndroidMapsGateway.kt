@@ -144,26 +144,21 @@ class AndroidMapsGateway(
 
         return try {
 
-            val uri =
-                Uri.parse(
-                    "google.navigation:q=${Uri.encode(destination)}"
+            val uri = Uri.parse(
+                "google.navigation:q=${Uri.encode(destination)}"
+            )
+
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                uri
+            ).apply {
+
+                setPackage("com.google.android.apps.maps")
+
+                addFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK
                 )
-
-            val intent =
-                Intent(
-                    Intent.ACTION_VIEW,
-                    uri
-                ).apply {
-
-                    setPackage(
-                        "com.google.android.apps.maps"
-                    )
-
-                    addFlags(
-                        Intent.FLAG_ACTIVITY_NEW_TASK
-                    )
-
-                }
+            }
 
             context.startActivity(intent)
 
@@ -174,9 +169,44 @@ class AndroidMapsGateway(
             e.printStackTrace()
 
             false
-
         }
+    }
 
+    override fun navigate(
+        origin: String,
+        destination: String
+    ): Boolean {
+
+        return try {
+
+            val uri = Uri.parse(
+                "https://www.google.com/maps/dir/?api=1" +
+                        "&origin=${Uri.encode(origin)}" +
+                        "&destination=${Uri.encode(destination)}"
+            )
+
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                uri
+            ).apply {
+
+                setPackage("com.google.android.apps.maps")
+
+                addFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK
+                )
+            }
+
+            context.startActivity(intent)
+
+            true
+
+        } catch (e: Exception) {
+
+            e.printStackTrace()
+
+            false
+        }
     }
 
     override fun searchPlace(

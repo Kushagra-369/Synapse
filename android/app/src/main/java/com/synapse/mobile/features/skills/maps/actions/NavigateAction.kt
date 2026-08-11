@@ -22,7 +22,14 @@ class NavigateAction(
                 "Missing parameter: destination"
             )
 
-        val success = gateway.navigate(destination)
+        val origin = command.parameters["origin"]
+            ?.toString()
+
+        val success = if (!origin.isNullOrBlank()) {
+            gateway.navigate(origin, destination)
+        } else {
+            gateway.navigate(destination)
+        }
 
         return CommandResult(
             success,

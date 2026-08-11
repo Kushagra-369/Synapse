@@ -8,9 +8,9 @@ interface MapsGateway {
         query: String
     ): Boolean
 
-    fun navigate(
-        destination: String
-    ): Boolean
+    fun navigate(destination: String): Boolean
+
+    fun navigate(origin: String, destination: String): Boolean
 
     fun searchPlace(
         place: String
