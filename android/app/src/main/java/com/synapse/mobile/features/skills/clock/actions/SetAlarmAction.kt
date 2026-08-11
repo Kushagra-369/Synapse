@@ -11,7 +11,7 @@ class SetAlarmAction(
 
     override val name: String = "set_alarm"
 
-    override fun execute(command: Command): CommandResult {
+    override suspend fun execute(command: Command): CommandResult {
 
         val time =
             command.parameters["time"]

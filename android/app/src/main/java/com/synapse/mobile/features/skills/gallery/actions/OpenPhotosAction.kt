@@ -11,7 +11,7 @@ class OpenPhotosAction(
 
     override val name: String = "open_photos"
 
-    override fun execute(command: Command): CommandResult {
+    override suspend fun execute(command: Command): CommandResult {
 
         val success = gateway.openPhotos()
 

@@ -11,7 +11,7 @@ class PlayYouTubeAction(
 
     override val name: String = "play"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

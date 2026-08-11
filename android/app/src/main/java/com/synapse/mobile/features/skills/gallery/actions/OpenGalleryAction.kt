@@ -11,7 +11,7 @@ class OpenGalleryAction(
 
     override val name: String = "open_gallery"
 
-    override fun execute(command: Command): CommandResult {
+    override suspend fun execute(command: Command): CommandResult {
 
         val success = gateway.openGallery()
 

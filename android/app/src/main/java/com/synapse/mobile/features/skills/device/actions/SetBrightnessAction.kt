@@ -11,7 +11,7 @@ class SetBrightnessAction(
 
     override val name = "set_brightness"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

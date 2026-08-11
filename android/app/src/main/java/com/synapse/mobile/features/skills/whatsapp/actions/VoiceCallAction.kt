@@ -14,7 +14,7 @@ class VoiceCallAction(
 
     override val name: String = "voice_call"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

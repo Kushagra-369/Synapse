@@ -11,7 +11,7 @@ class SetBluetoothAction(
 
     override val name = "set_bluetooth"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

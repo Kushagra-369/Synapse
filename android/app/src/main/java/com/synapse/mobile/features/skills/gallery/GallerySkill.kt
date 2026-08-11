@@ -20,7 +20,7 @@ class GallerySkill(
         "open_videos" to OpenVideosAction(gateway)
     )
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

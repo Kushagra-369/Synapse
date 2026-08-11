@@ -11,7 +11,7 @@ class SetDndAction(
 
     override val name = "set_dnd"
 
-    override fun execute(command: Command): CommandResult {
+    override suspend fun execute(command: Command): CommandResult {
 
         val enabled =
             command.parameters["enabled"] as? Boolean

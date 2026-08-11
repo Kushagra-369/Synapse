@@ -7,8 +7,7 @@ interface Skill {
 
     val name: String
 
-    fun execute(
+    suspend fun execute(
         command: Command
     ): CommandResult
-
 }

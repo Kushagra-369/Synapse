@@ -8,7 +8,7 @@ class SetHotspotAction : Action {
 
     override val name = "set_hotspot"
 
-    override fun execute(command: Command): CommandResult {
+    override suspend fun execute(command: Command): CommandResult {
 
         return CommandResult(
             false,

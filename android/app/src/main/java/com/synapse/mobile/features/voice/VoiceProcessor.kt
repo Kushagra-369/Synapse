@@ -36,7 +36,7 @@ class VoiceProcessor(
 
         val response = ResponseGenerator.generate(
             command = command,
-            success = executionResult.success
+            executionResult = executionResult
         )
 
         textToSpeechManager.speak(response.message)

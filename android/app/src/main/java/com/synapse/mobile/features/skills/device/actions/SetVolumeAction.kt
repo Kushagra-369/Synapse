@@ -11,7 +11,7 @@ class SetVolumeAction(
 
     override val name = "set_volume"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

@@ -11,7 +11,7 @@ class TurnOnFlashlightAction(
 
     override val name = "turn_on"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

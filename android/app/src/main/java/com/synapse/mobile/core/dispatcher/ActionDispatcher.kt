@@ -7,7 +7,7 @@ class ActionDispatcher(
     private val registry: SkillRegistry
 ) {
 
-    fun dispatch(command: Command): CommandResult {
+    suspend fun dispatch(command: Command): CommandResult {
 
         val skill = registry.get(command.skill)
 

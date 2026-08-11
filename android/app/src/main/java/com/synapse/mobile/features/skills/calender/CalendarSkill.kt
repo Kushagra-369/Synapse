@@ -16,7 +16,7 @@ class CalendarSkill(
         "create_event" to CreateEventAction(gateway)
     )
 
-    override fun execute(command: Command): CommandResult {
+    override suspend fun execute(command: Command): CommandResult {
 
         val action = actions[command.action]
 

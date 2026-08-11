@@ -11,7 +11,7 @@ class GetBatteryAction(
 
     override val name = "get_battery"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

@@ -18,7 +18,7 @@ class AppsSkill(
         "launch_app" to LaunchAppAction(gateway, context)
     )
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

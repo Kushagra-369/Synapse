@@ -7,5 +7,5 @@ interface Action {
 
     val name: String
 
-    fun execute(command: Command): CommandResult
+    suspend fun execute(command: Command): CommandResult
 }

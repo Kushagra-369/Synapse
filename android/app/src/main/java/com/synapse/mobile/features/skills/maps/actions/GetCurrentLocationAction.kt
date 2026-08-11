@@ -11,14 +11,20 @@ class GetCurrentLocationAction(
 
     override val name = "get_current_location"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 
         val location = gateway.getCurrentLocation()
 
+        val failed =
+            location == null ||
+                    location == "Unable to get current location." ||
+                    location == "Unable to fetch current location." ||
+                    location == "Location permission not granted."
+
         return CommandResult(
-            success = location != null,
+            success = !failed,
             message = location ?: "Unable to get current location."
         )
     }

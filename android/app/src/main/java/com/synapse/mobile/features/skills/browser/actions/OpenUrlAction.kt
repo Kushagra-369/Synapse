@@ -11,7 +11,7 @@ class OpenUrlAction(
 
     override val name = "open_url"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

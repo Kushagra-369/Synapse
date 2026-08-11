@@ -7,31 +7,35 @@ object ResponseGenerator {
 
     fun generate(
         command: Command,
-        success: Boolean
+        executionResult: CommandResult
     ): CommandResult {
+
+        val success = executionResult.success
+        val executionMessage = executionResult.message
 
         val params = command.parameters
 
         val message = when (command.skill) {
 
-            "apps" -> {
+            "maps" -> {
 
-                val app = params["app"]?.toString() ?: "application"
+                when (command.action) {
 
-                if (success) {
+                    "get_current_location" -> {
 
-                    when (command.action) {
-                        "open" -> ResponseTemplates.OPENING_APP.format(app)
-                        "close" -> ResponseTemplates.CLOSING_APP.format(app)
-                        else -> ResponseTemplates.SUCCESS
+                        executionMessage
+
                     }
 
-                } else {
+                    else -> {
 
-                    ResponseTemplates.APP_NOT_FOUND.format(app)
+                        if (success)
+                            ResponseTemplates.OPENING_MAPS
+                        else
+                            ResponseTemplates.UNKNOWN_COMMAND
 
+                    }
                 }
-
             }
 
             "phone" -> {
@@ -78,10 +82,28 @@ object ResponseGenerator {
             }
 
             "maps" -> {
-                if (success)
-                    ResponseTemplates.OPENING_MAPS
-                else
-                    ResponseTemplates.UNKNOWN_COMMAND
+
+                when (command.action) {
+
+                    "get_current_location" -> {
+
+                        if (success) {
+                            ResponseTemplates.SUCCESS
+                        } else {
+                            "Unable to get current location."
+                        }
+
+                    }
+
+                    else -> {
+
+                        if (success)
+                            ResponseTemplates.OPENING_MAPS
+                        else
+                            ResponseTemplates.UNKNOWN_COMMAND
+
+                    }
+                }
             }
 
             "clock" -> {

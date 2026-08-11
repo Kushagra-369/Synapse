@@ -11,7 +11,7 @@ class OpenWhatsAppAction(
 
     override val name: String = "open"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

@@ -63,7 +63,7 @@ class SynapseEngine(
         registry.register(MapsSkill(AndroidMapsGateway(context)))
     }
 
-    fun execute(command: Command): CommandResult {
+    suspend fun execute(command: Command): CommandResult {
         lastCommand = command
 
         validator.validate(command)?.let {
@@ -73,11 +73,13 @@ class SynapseEngine(
         return dispatcher.dispatch(command)
     }
 
-    fun executeBatch(batch: CommandBatch): BatchResult {
+    suspend fun executeBatch(batch: CommandBatch): BatchResult {
         if (batch.commands.isEmpty()) {
             return BatchResult(emptyList())
         }
-        val results = batch.commands.map(::execute)
+
+        val results = batch.commands.map { execute(it) }
+
         return BatchResult(results)
     }
 }

@@ -16,7 +16,7 @@ class BrowserSkill(
         "openWebsite" to OpenUrlAction(gateway)
     )
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

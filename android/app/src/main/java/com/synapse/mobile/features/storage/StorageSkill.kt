@@ -11,7 +11,7 @@ class StorageSkill(
 
     override val name = "storage"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

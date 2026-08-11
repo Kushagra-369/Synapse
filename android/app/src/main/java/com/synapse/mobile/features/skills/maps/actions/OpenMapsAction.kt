@@ -11,7 +11,7 @@ class OpenMapsAction(
 
     override val name = "open_maps"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

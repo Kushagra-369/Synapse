@@ -13,7 +13,7 @@ class SendMessageAction(
 
     override val name: String = "send_message"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

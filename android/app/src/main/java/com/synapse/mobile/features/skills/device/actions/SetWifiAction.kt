@@ -11,7 +11,7 @@ class SetWifiAction(
 
     override val name = "set_wifi"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

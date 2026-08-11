@@ -11,7 +11,7 @@ class StartStopwatchAction(
 
     override val name: String = "start_stopwatch"
 
-    override fun execute(command: Command): CommandResult {
+    override suspend fun execute(command: Command): CommandResult {
 
         val success = gateway.startStopwatch()
 

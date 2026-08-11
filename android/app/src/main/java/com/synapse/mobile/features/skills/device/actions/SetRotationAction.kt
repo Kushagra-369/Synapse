@@ -11,7 +11,7 @@ class SetRotationAction(
 
     override val name = "set_rotation"
 
-    override fun execute(command: Command): CommandResult {
+    override suspend fun execute(command: Command): CommandResult {
 
         val enabled =
             command.parameters["enabled"] as? Boolean

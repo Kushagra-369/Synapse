@@ -13,7 +13,7 @@ class LaunchAppAction(
 
     override val name: String = "launch_app"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

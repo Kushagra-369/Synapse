@@ -16,7 +16,7 @@ class ClockSkill(
         "set_alarm" to SetAlarmAction(gateway)
     )
 
-    override fun execute(command: Command): CommandResult {
+    override suspend fun execute(command: Command): CommandResult {
 
         val action = actions[command.action]
 

@@ -11,7 +11,7 @@ class StartTimerAction(
 
     override val name: String = "start_timer"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

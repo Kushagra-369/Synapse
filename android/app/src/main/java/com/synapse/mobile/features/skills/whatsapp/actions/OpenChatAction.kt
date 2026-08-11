@@ -13,7 +13,7 @@ class OpenChatAction(
 
     override val name: String = "open_chat"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

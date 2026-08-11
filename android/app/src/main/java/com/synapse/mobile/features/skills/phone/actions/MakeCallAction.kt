@@ -13,7 +13,7 @@ class MakeCallAction(
 
     override val name: String = "dial_phone"
 
-    override fun execute(command: Command): CommandResult {
+    override suspend fun execute(command: Command): CommandResult {
 
         val number = when {
 

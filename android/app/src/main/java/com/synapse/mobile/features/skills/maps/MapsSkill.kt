@@ -22,7 +22,7 @@ class MapsSkill(
         "get_current_location" to GetCurrentLocationAction(gateway)
     )
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

@@ -11,7 +11,7 @@ class CreateEventAction(
 
     override val name: String = "create_event"
 
-    override fun execute(command: Command): CommandResult {
+    override suspend fun execute(command: Command): CommandResult {
 
         val title =
             command.parameters["title"]?.toString()

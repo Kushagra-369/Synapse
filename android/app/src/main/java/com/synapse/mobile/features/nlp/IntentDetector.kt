@@ -8,7 +8,6 @@ enum class IntentType {
     OPEN_MAPS,
     MAPS_NAVIGATE,
     MAPS_SEARCH,
-
     GET_CURRENT_LOCATION,
     CALL_CONTACT,
     SEND_WHATSAPP,

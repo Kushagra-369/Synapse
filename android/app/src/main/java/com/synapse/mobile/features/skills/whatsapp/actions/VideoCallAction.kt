@@ -13,7 +13,7 @@ class VideoCallAction(
 
     override val name: String = "video_call"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

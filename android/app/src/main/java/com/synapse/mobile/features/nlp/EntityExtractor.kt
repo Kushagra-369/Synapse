@@ -435,6 +435,7 @@ object EntityExtractor {
         val lower = text.lowercase().trim()
 
         // "Delhi to Noida"
+        // Destination = Noida
         Regex(
             """^(.+?)\s+to\s+(.+)$"""
         )
@@ -445,7 +446,9 @@ object EntityExtractor {
             ?.takeIf { it.isNotBlank() }
             ?.let { return it }
 
+
         // "Delhi se Noida"
+        // Destination = Noida
         Regex(
             """^(.+?)\s+se\s+(.+?)(?:\s+(?:directions?|route|rasta|raasta))?$"""
         )
@@ -456,9 +459,14 @@ object EntityExtractor {
             ?.takeIf { it.isNotBlank() }
             ?.let { return it }
 
-        // "India Gate le chalo"
+
+        // "go to Delhi"
+        // "go Delhi"
+        // "take me to Delhi"
+        // "take me Delhi"
+        // Destination = Delhi
         Regex(
-            """(.+?)\s+(?:le chalo|le jao|pahucha do|pahuncha do)$"""
+            """^(?:go\s+to|go|take\s+me\s+to|take\s+me|navigate\s+to)\s+(.+)$"""
         )
             .find(lower)
             ?.groupValues
@@ -466,10 +474,26 @@ object EntityExtractor {
             ?.trim()
             ?.takeIf { it.isNotBlank() }
             ?.let { return it }
+
+
+        // "India Gate le chalo"
+        // "India Gate le jao"
+        // Destination = India Gate
+        Regex(
+            """^(.+?)\s+(?:le chalo|le jao|pahucha do|pahuncha do)$"""
+        )
+            .find(lower)
+            ?.groupValues
+            ?.get(1)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
+
 
         // "ghar ka rasta dikhao"
+        // Destination = ghar
         Regex(
-            """(.+?)\s+(?:ka|ki|ke)\s+(?:rasta|raasta|route|directions?)"""
+            """^(.+?)\s+(?:ka|ki|ke)\s+(?:rasta|raasta|route|directions?)"""
         )
             .find(lower)
             ?.groupValues
@@ -478,9 +502,13 @@ object EntityExtractor {
             ?.takeIf { it.isNotBlank() }
             ?.let { return it }
 
+
         // "directions to India Gate"
+        // "route to India Gate"
+        // "navigate to India Gate"
+        // Destination = India Gate
         Regex(
-            """(?:directions?|route|navigate)\s+(?:to|for)\s+(.+)"""
+            """^(?:directions?|route|navigate)\s+(?:to|for)\s+(.+)$"""
         )
             .find(lower)
             ?.groupValues
@@ -488,9 +516,12 @@ object EntityExtractor {
             ?.trim()
             ?.takeIf { it.isNotBlank() }
             ?.let { return it }
+
 
         return null
     }
+
+
 
     private fun extractNavigationOrigin(text: String): String? {
 

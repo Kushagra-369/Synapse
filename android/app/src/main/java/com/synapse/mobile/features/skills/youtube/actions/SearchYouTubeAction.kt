@@ -11,7 +11,7 @@ class SearchYouTubeAction(
 
     override val name: String = "search"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 

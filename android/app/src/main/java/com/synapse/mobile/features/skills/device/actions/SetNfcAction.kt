@@ -8,7 +8,7 @@ class SetNfcAction : Action {
 
     override val name = "set_nfc"
 
-    override fun execute(command: Command): CommandResult {
+    override suspend fun execute(command: Command): CommandResult {
 
         return CommandResult(
             false,

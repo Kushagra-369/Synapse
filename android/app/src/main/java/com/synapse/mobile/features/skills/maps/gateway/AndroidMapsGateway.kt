@@ -11,90 +11,131 @@ import com.google.android.gms.location.LocationServices
 import java.util.Locale
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-
+import android.os.Looper
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.Priority
+import android.os.HandlerThread
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 class AndroidMapsGateway(
     private val context: Context
 ) : MapsGateway {
 
-    override fun getCurrentLocation(): String? {
+    override suspend fun getCurrentLocation(): String? {
 
-        if (
+        val fineGranted =
             ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
+            ) == PackageManager.PERMISSION_GRANTED
+
+        val coarseGranted =
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+
+        if (!fineGranted && !coarseGranted) {
             return "Location permission not granted."
         }
 
         val fusedClient =
             LocationServices.getFusedLocationProviderClient(context)
 
-        var result: String? = null
+        return try {
 
-        val latch = CountDownLatch(1)
+            val location =
+                suspendCancellableCoroutine<android.location.Location?> { continuation ->
 
-        fusedClient.lastLocation
-            .addOnSuccessListener { location ->
+                    fusedClient.lastLocation
 
-                if (location == null) {
+                        .addOnSuccessListener { location ->
 
-                    result = "Unable to get location."
+                            android.util.Log.d(
+                                "SYNAPSE_LOCATION",
+                                "Last location result = $location"
+                            )
 
-                    latch.countDown()
-
-                    return@addOnSuccessListener
-                }
-
-                try {
-
-                    val geocoder =
-                        Geocoder(
-                            context,
-                            Locale.getDefault()
-                        )
-
-                    val addresses =
-                        geocoder.getFromLocation(
-                            location.latitude,
-                            location.longitude,
-                            1
-                        )
-
-                    result =
-                        if (
-                            !addresses.isNullOrEmpty()
-                        ) {
-                            addresses[0].getAddressLine(0)
-                        } else {
-                            "Lat: ${location.latitude}\nLng: ${location.longitude}"
+                            if (continuation.isActive) {
+                                continuation.resume(location)
+                            }
                         }
 
-                } catch (e: Exception) {
+                        .addOnFailureListener { exception ->
 
-                    result =
-                        "Lat: ${location.latitude}\nLng: ${location.longitude}"
+                            android.util.Log.e(
+                                "SYNAPSE_LOCATION",
+                                "Location request failed",
+                                exception
+                            )
 
+                            if (continuation.isActive) {
+                                continuation.resume(null)
+                            }
+                        }
                 }
 
-                latch.countDown()
+            if (location != null) {
 
+                getAddressFromLocation(
+                    location.latitude,
+                    location.longitude
+                )
+
+            } else {
+
+                "Unable to get current location."
             }
-            .addOnFailureListener {
 
-                result = "Unable to fetch location."
+        } catch (e: Exception) {
 
-                latch.countDown()
+            android.util.Log.e(
+                "SYNAPSE_LOCATION",
+                "Location error",
+                e
+            )
 
+            "Unable to get current location."
+        }
+    }
+
+    private fun getAddressFromLocation(
+        latitude: Double,
+        longitude: Double
+    ): String {
+
+        return try {
+
+            val geocoder =
+                Geocoder(
+                    context,
+                    Locale.getDefault()
+                )
+
+            val addresses =
+                geocoder.getFromLocation(
+                    latitude,
+                    longitude,
+                    1
+                )
+
+            if (!addresses.isNullOrEmpty()) {
+
+                addresses[0].getAddressLine(0)
+
+            } else {
+
+                "Lat: $latitude, Lng: $longitude"
             }
 
-        latch.await(
-            5,
-            TimeUnit.SECONDS
-        )
+        } catch (e: Exception) {
 
-        return result
+            e.printStackTrace()
 
+            "Lat: $latitude, Lng: $longitude"
+        }
     }
 
     override fun openMaps(

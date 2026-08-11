@@ -2,7 +2,7 @@ package com.synapse.mobile.features.skills.maps.gateway
 
 interface MapsGateway {
 
-    fun getCurrentLocation(): String?
+    suspend fun getCurrentLocation(): String?
 
     fun openMaps(
         query: String

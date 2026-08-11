@@ -11,7 +11,7 @@ class FindContactAction(
 
     override val name: String = "find_contact"
 
-    override fun execute(
+    override suspend fun execute(
         command: Command
     ): CommandResult {
 
