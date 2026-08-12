@@ -76,9 +76,27 @@ object EntityExtractor {
                 }
             }
 
+            IntentType.PLAY_MEDIA -> {
+                extractMediaQuery(text)?.let {
+                    params["query"] = it
+                }
+            }
+
             IntentType.OPEN_YOUTUBE -> {
                 extractWebsite(text)?.let {
                     params["website"] = it
+                }
+            }
+
+            IntentType.SEARCH_YOUTUBE -> {
+                extractYouTubeQuery(text)?.let {
+                    params["query"] = it
+                }
+            }
+
+            IntentType.PLAY_YOUTUBE -> {
+                extractYouTubeQuery(text)?.let {
+                    params["query"] = it
                 }
             }
 
@@ -265,7 +283,17 @@ object EntityExtractor {
     // ----------------------------------------------------------------------
     // Contact extraction (Enhanced with Hinglish support)
     // ----------------------------------------------------------------------
+    private fun extractMediaQuery(text: String): String? {
 
+        return Regex(
+            """^(?:play|chalao|bajao)\s+(.+)$"""
+        )
+            .find(text.lowercase().trim())
+            ?.groupValues
+            ?.get(1)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+    }
     private fun extractContact(text: String): String? {
 
         val lower = text.lowercase().trim()
@@ -650,7 +678,84 @@ object EntityExtractor {
     // ----------------------------------------------------------------------
     // URL
     // ----------------------------------------------------------------------
+    private fun extractYouTubeQuery(text: String): String? {
 
+        val lower = text.lowercase().trim()
+
+        // search Minecraft on youtube
+        Regex(
+            """^(?:search|find|dhoondo|dhundo)\s+(.+?)\s+(?:on|par)\s+(?:youtube|yt)$"""
+        )
+            .find(lower)
+            ?.groupValues
+            ?.get(1)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
+
+
+        // play Believer on youtube
+        Regex(
+            """^(?:play|chalao|bajao)\s+(.+?)\s+(?:on|par)\s+(?:youtube|yt)$"""
+        )
+            .find(lower)
+            ?.groupValues
+            ?.get(1)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
+
+
+        // youtube par Minecraft search karo
+        Regex(
+            """^(?:youtube|yt)\s+(?:par|pe)\s+(.+?)\s+(?:search|find|dhoondo|dhundo)(?:\s+ karo)?$"""
+        )
+            .find(lower)
+            ?.groupValues
+            ?.get(1)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
+
+
+        // youtube par Believer chalao
+        Regex(
+            """^(?:youtube|yt)\s+(?:par|pe)\s+(.+?)\s+(?:play|chalao|bajao)$"""
+        )
+            .find(lower)
+            ?.groupValues
+            ?.get(1)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
+
+
+        // search Minecraft
+        Regex(
+            """^(?:search|find|dhoondo|dhundo)\s+(.+?)(?:\s+(?:on|par)\s+(?:youtube|yt))?$"""
+        )
+            .find(lower)
+            ?.groupValues
+            ?.get(1)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
+
+
+        // play Believer
+        Regex(
+            """^(?:play|chalao|bajao)\s+(.+?)(?:\s+(?:on|par)\s+(?:youtube|yt))?$"""
+        )
+            .find(lower)
+            ?.groupValues
+            ?.get(1)
+            ?.trim()
+            ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
+
+
+        return null
+    }
 
     private fun extractUrl(text: String): String? {
         val regex = Regex("""https?://[^\s]+|www\.[^\s]+""", RegexOption.IGNORE_CASE)

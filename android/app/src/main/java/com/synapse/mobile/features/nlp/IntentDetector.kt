@@ -5,6 +5,15 @@ enum class IntentType {
     CLOSE_APP,
     OPEN_WEBSITE,
     OPEN_YOUTUBE,
+    SEARCH_YOUTUBE,
+    PLAY_YOUTUBE,
+
+    PLAY_MEDIA,
+    PAUSE_MEDIA,
+    RESUME_MEDIA,
+    STOP_MEDIA,
+    NEXT_MEDIA,
+    PREVIOUS_MEDIA,
     OPEN_MAPS,
     MAPS_NAVIGATE,
     MAPS_SEARCH,
@@ -45,7 +54,15 @@ object IntentDetector {
             isMapsNavigate(lower) -> IntentType.MAPS_NAVIGATE
             isMapsSearch(lower) -> IntentType.MAPS_SEARCH
             isMaps(lower) -> IntentType.OPEN_MAPS
+            isYoutubePlay(lower) -> IntentType.PLAY_YOUTUBE
+            isYoutubeSearch(lower) -> IntentType.SEARCH_YOUTUBE
             isYoutube(lower) -> IntentType.OPEN_YOUTUBE
+            isMediaPause(lower) -> IntentType.PAUSE_MEDIA
+            isMediaResume(lower) -> IntentType.RESUME_MEDIA
+            isMediaStop(lower) -> IntentType.STOP_MEDIA
+            isMediaNext(lower) -> IntentType.NEXT_MEDIA
+            isMediaPrevious(lower) -> IntentType.PREVIOUS_MEDIA
+            isMediaPlay(lower) -> IntentType.PLAY_MEDIA
             isFlashlightOn(lower) -> IntentType.FLASHLIGHT_ON
             isFlashlightOff(lower) -> IntentType.FLASHLIGHT_OFF
             isBrightness(lower) -> IntentType.SET_BRIGHTNESS
@@ -213,11 +230,73 @@ object IntentDetector {
                 )
     }
 
+    private fun isYoutubePlay(text: String): Boolean {
 
+        return (
+                text.contains("play") ||
+                        text.contains("chalao") ||
+                        text.contains("bajao") ||
+                        text.contains("chala de") ||
+                        text.contains("baja do")
+                ) && (
+                text.contains("youtube") ||
+                        text.contains("yt")
+                )
+    }
+
+    private fun isYoutubeSearch(text: String): Boolean {
+
+        return (
+                text.contains("search") ||
+                        text.contains("find") ||
+                        text.contains("dhoondo") ||
+                        text.contains("dhundo") ||
+                        text.contains("search karo")
+                ) && (
+                text.contains("youtube") ||
+                        text.contains("yt")
+                )
+    }
 
     private fun isYoutube(text: String): Boolean {
         // Specifically detect "youtube" or "yt" – this should come before generic open.
         return containsAny(text, listOf("youtube", "yt"))
+    }
+
+    private fun isMediaPlay(text: String): Boolean {
+        return text.startsWith("play ") ||
+                text == "play" ||
+                text.startsWith("chalao ") ||
+                text.startsWith("bajao ")
+    }
+
+    private fun isMediaPause(text: String): Boolean {
+        return text == "pause" ||
+                text == "pause media" ||
+                text == "media pause"
+    }
+
+    private fun isMediaResume(text: String): Boolean {
+        return text == "resume" ||
+                text == "resume media" ||
+                text == "continue"
+    }
+
+    private fun isMediaStop(text: String): Boolean {
+        return text == "stop" ||
+                text == "stop media"
+    }
+
+    private fun isMediaNext(text: String): Boolean {
+        return text == "next" ||
+                text == "next song" ||
+                text == "next track"
+    }
+
+    private fun isMediaPrevious(text: String): Boolean {
+        return text == "previous" ||
+                text == "previous song" ||
+                text == "previous track"
     }
 
     private fun isFlashlightOn(text: String): Boolean {

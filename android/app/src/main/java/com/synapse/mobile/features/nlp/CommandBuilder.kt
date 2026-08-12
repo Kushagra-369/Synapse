@@ -43,6 +43,70 @@ object CommandBuilder {
                 )
             }
 
+            IntentType.SEARCH_YOUTUBE -> {
+                Command(
+                    skill = "youtube",
+                    action = "search",
+                    parameters = parameters
+                )
+            }
+
+            IntentType.PLAY_YOUTUBE -> {
+                Command(
+                    skill = "youtube",
+                    action = "play",
+                    parameters = parameters
+                )
+            }
+
+            IntentType.PLAY_MEDIA -> {
+                Command(
+                    skill = "media",
+                    action = "play",
+                    parameters = parameters
+                )
+            }
+
+            IntentType.PAUSE_MEDIA -> {
+                Command(
+                    skill = "media",
+                    action = "pause",
+                    parameters = parameters
+                )
+            }
+
+            IntentType.RESUME_MEDIA -> {
+                Command(
+                    skill = "media",
+                    action = "resume",
+                    parameters = parameters
+                )
+            }
+
+            IntentType.STOP_MEDIA -> {
+                Command(
+                    skill = "media",
+                    action = "stop",
+                    parameters = parameters
+                )
+            }
+
+            IntentType.NEXT_MEDIA -> {
+                Command(
+                    skill = "media",
+                    action = "next",
+                    parameters = parameters
+                )
+            }
+
+            IntentType.PREVIOUS_MEDIA -> {
+                Command(
+                    skill = "media",
+                    action = "previous",
+                    parameters = parameters
+                )
+            }
+
             IntentType.OPEN_MAPS -> {
                 Command(
                     skill = "maps",
@@ -50,6 +114,7 @@ object CommandBuilder {
                     parameters = parameters
                 )
             }
+
 
             IntentType.MAPS_NAVIGATE -> {
                 Command(

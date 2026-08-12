@@ -44,6 +44,9 @@ import com.synapse.mobile.features.skills.whatsapp.gateway.WhatsAppGateway
 import com.synapse.mobile.features.skills.device.DeviceSkill
 import com.synapse.mobile.features.skills.device.gateway.AndroidDeviceGateway
 import com.synapse.mobile.features.skills.device.gateway.DeviceGateway
+import com.synapse.mobile.features.skills.media.MediaSkill
+import com.synapse.mobile.features.skills.media.gateway.AndroidMediaGateway
+import com.synapse.mobile.features.skills.media.gateway.MediaGateway
 class AppContainer(
     context: Context
 ) {
@@ -53,6 +56,9 @@ class AppContainer(
         AndroidWhatsAppGateway(context)
     val youtubeGateway: YouTubeGateway =
         AndroidYouTubeGateway(context)
+
+    val mediaGateway: MediaGateway =
+        AndroidMediaGateway(context)
     val galleryGateway: GalleryGateway =
         AndroidGalleryGateway(context)
     val flashlightGateway: FlashlightGateway =
@@ -108,6 +114,10 @@ class AppContainer(
             YouTubeSkill(youtubeGateway)
         )
 
+
+        register(
+            MediaSkill(mediaGateway)
+        )
 
         register(
             MapsSkill(mapsGateway)

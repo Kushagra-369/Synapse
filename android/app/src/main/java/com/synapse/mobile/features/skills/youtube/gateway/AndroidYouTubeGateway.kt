@@ -37,14 +37,22 @@ class AndroidYouTubeGateway(
 
         return try {
 
+            val encodedQuery =
+                Uri.encode(query)
+
             val intent = Intent(
                 Intent.ACTION_VIEW,
                 Uri.parse(
-                    "https://www.youtube.com/results?search_query=$query"
+                    "https://www.youtube.com/results?search_query=$encodedQuery"
                 )
-            )
+            ).apply {
 
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                setPackage("com.google.android.youtube")
+
+                addFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK
+                )
+            }
 
             context.startActivity(intent)
 
@@ -52,10 +60,30 @@ class AndroidYouTubeGateway(
 
         } catch (e: Exception) {
 
-            false
+            try {
 
+                val fallbackIntent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(
+                        "https://www.youtube.com/results?search_query=${Uri.encode(query)}"
+                    )
+                ).apply {
+                    addFlags(
+                        Intent.FLAG_ACTIVITY_NEW_TASK
+                    )
+                }
+
+                context.startActivity(fallbackIntent)
+
+                true
+
+            } catch (e2: Exception) {
+
+                e2.printStackTrace()
+
+                false
+            }
         }
-
     }
 
     override fun play(query: String): Boolean {
