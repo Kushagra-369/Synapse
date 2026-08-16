@@ -8,6 +8,8 @@ enum class IntentType {
     SEARCH_YOUTUBE,
     PLAY_YOUTUBE,
 
+    MEDIA_SELECTION,
+
     PLAY_MEDIA,
     PAUSE_MEDIA,
     RESUME_MEDIA,
@@ -62,6 +64,7 @@ object IntentDetector {
             isMediaStop(lower) -> IntentType.STOP_MEDIA
             isMediaNext(lower) -> IntentType.NEXT_MEDIA
             isMediaPrevious(lower) -> IntentType.PREVIOUS_MEDIA
+            isMediaSelection(lower) -> IntentType.MEDIA_SELECTION
             isMediaPlay(lower) -> IntentType.PLAY_MEDIA
             isFlashlightOn(lower) -> IntentType.FLASHLIGHT_ON
             isFlashlightOff(lower) -> IntentType.FLASHLIGHT_OFF
@@ -297,6 +300,20 @@ object IntentDetector {
         return text == "previous" ||
                 text == "previous song" ||
                 text == "previous track"
+    }
+
+    private fun isMediaSelection(text: String): Boolean {
+
+        val lower =
+            text.lowercase().trim()
+
+        return (
+                lower.matches(
+                    Regex(
+                        """(?:first|1st|second|2nd|third|3rd|number\s*[1-3]|option\s*[1-3]|no\.?\s*[1-3]|pehla|pehli|doosra|dusra|teesra|tisra)(?:\s+(?:one|wala|wali))?"""
+                    )
+                )
+                )
     }
 
     private fun isFlashlightOn(text: String): Boolean {

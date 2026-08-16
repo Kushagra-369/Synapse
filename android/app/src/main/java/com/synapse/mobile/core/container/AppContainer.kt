@@ -1,5 +1,5 @@
 package com.synapse.mobile.core.container
-
+import com.synapse.mobile.features.skills.media.session.MediaSelectionState
 import com.synapse.mobile.features.skills.media.provider.BackendMediaProvider
 import com.synapse.mobile.features.skills.media.provider.CatalogMediaProvider
 import com.synapse.mobile.features.skills.media.provider.MediaProvider
@@ -62,16 +62,18 @@ class AppContainer(
         AndroidYouTubeGateway(context)
     val mediaProviders: List<MediaProvider> =
         listOf(
-            CatalogMediaProvider(),
-
             BackendMediaProvider(
-                "http://YOUR_SERVER_IP:PORT"
-            )
+                "http://192.168.1.5:6969"
+            ),
+
+            CatalogMediaProvider()
         )
 
     val mediaResolver =
         MediaResolver(mediaProviders)
 
+    val mediaSelectionState =
+        MediaSelectionState()
     val mediaGateway: MediaGateway =
         AndroidMediaGateway(
             context,
@@ -133,9 +135,12 @@ class AppContainer(
             YouTubeSkill(youtubeGateway)
         )
 
-
         register(
-            MediaSkill(mediaGateway)
+            MediaSkill(
+                mediaGateway,
+                mediaResolver,
+                mediaSelectionState
+            )
         )
 
         register(

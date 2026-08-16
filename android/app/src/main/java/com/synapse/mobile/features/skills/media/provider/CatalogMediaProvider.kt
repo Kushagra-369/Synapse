@@ -1,5 +1,6 @@
 package com.synapse.mobile.features.skills.media.provider
 
+import com.synapse.mobile.features.skills.media.resolver.MediaSearchResult
 import com.synapse.mobile.features.skills.media.resolver.MediaSource
 
 class CatalogMediaProvider : MediaProvider {
@@ -8,35 +9,48 @@ class CatalogMediaProvider : MediaProvider {
 
         MediaSource(
             title = "test",
-            uri = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+            uri = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+            artist = "Synapse",
+            album = "Test Album",
+            duration = 180
         ),
 
         MediaSource(
             title = "test 2",
-            uri = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+            uri = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+            artist = "Synapse",
+            album = "Test Album",
+            duration = 200
         ),
 
         MediaSource(
             title = "test 3",
-            uri = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+            uri = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+            artist = "Synapse",
+            album = "Test Album",
+            duration = 220
         )
     )
 
-    override suspend fun search(query: String): MediaSource? {
+    override suspend fun search(
+        query: String
+    ): MediaSearchResult? {
 
         val normalized =
             query.trim().lowercase()
 
-        // Exact match
-        catalog.firstOrNull {
-            it.title.lowercase() == normalized
-        }?.let {
-            return it
-        }
+        val result =
+            catalog.firstOrNull {
+                it.title.lowercase() == normalized
+            }
+                ?: catalog.firstOrNull {
+                    it.title.lowercase()
+                        .contains(normalized)
+                }
+                ?: return null
 
-        // Partial match
-        return catalog.firstOrNull {
-            it.title.lowercase().contains(normalized)
-        }
+        return MediaSearchResult(
+            bestMatch = result
+        )
     }
 }

@@ -66,6 +66,13 @@ object CommandBuilder {
                     parameters = parameters
                 )
             }
+            IntentType.MEDIA_SELECTION -> {
+                Command(
+                    skill = "media",
+                    action = "play",
+                    parameters = parameters
+                )
+            }
 
             IntentType.PAUSE_MEDIA -> {
                 Command(
@@ -82,6 +89,7 @@ object CommandBuilder {
                     parameters = parameters
                 )
             }
+
 
             IntentType.STOP_MEDIA -> {
                 Command(

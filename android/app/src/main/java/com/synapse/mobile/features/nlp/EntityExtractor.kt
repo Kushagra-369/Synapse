@@ -54,7 +54,13 @@ object EntityExtractor {
         text: String,
         intent: IntentType
     ): MutableMap<String, Any>{
+
         val params = mutableMapOf<String, Any>()
+
+
+        extractMediaSelection(text)?.let {
+            params["selectionIndex"] = it
+        }
 
         when (intent) {
 
@@ -293,6 +299,56 @@ object EntityExtractor {
             ?.get(1)
             ?.trim()
             ?.takeIf { it.isNotBlank() }
+    }
+
+    private fun extractMediaSelection(
+        text: String
+    ): Int? {
+
+        val lower =
+            text.lowercase().trim()
+
+        return when {
+
+            // First
+            lower.matches(
+                Regex("""(?:first|1st|number\s*1|option\s*1|no\.?\s*1)(?:\s+(?:one|wala|wali))?""")
+            ) -> 0
+
+            // Second
+            lower.matches(
+                Regex("""(?:second|2nd|number\s*2|option\s*2|no\.?\s*2)(?:\s+(?:one|wala|wali))?""")
+            ) -> 1
+
+            // Third
+            lower.matches(
+                Regex("""(?:third|3rd|number\s*3|option\s*3|no\.?\s*3)(?:\s+(?:one|wala|wali))?""")
+            ) -> 2
+
+            // Hinglish
+            lower in listOf(
+                "pehla",
+                "pehli",
+                "pehla wala",
+                "pehli wali"
+            ) -> 0
+
+            lower in listOf(
+                "doosra",
+                "dusra",
+                "doosra wala",
+                "dusra wala"
+            ) -> 1
+
+            lower in listOf(
+                "teesra",
+                "tisra",
+                "teesra wala",
+                "tisra wala"
+            ) -> 2
+
+            else -> null
+        }
     }
     private fun extractContact(text: String): String? {
 

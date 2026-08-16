@@ -1,5 +1,7 @@
 package com.synapse.mobile.features.skills.media.provider
 
+import android.util.Log
+import com.synapse.mobile.features.skills.media.resolver.MediaSearchResult
 import com.synapse.mobile.features.skills.media.resolver.MediaSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -14,7 +16,7 @@ class BackendMediaProvider(
 
     override suspend fun search(
         query: String
-    ): MediaSource? = withContext(Dispatchers.IO) {
+    ): MediaSearchResult? = withContext(Dispatchers.IO) {
 
         var connection: HttpURLConnection? = null
 
@@ -41,6 +43,11 @@ class BackendMediaProvider(
             val responseCode =
                 connection.responseCode
 
+            Log.d(
+                "SYNAPSE_MEDIA",
+                "BACKEND HTTP CODE: $responseCode"
+            )
+
             if (responseCode !in 200..299) {
                 return@withContext null
             }
@@ -57,31 +64,132 @@ class BackendMediaProvider(
                 return@withContext null
             }
 
+            // -----------------------------
+            // BEST MATCH
+            // -----------------------------
+
             val media =
                 json.optJSONObject("media")
                     ?: return@withContext null
 
-            val title =
-                media.optString("title")
+            fun parseMedia(
+                jsonObject: JSONObject
+            ): MediaSource? {
 
-            val uri =
-                media.optString("uri")
+                val title =
+                    jsonObject.optString("title")
 
-            if (
-                title.isBlank() ||
-                uri.isBlank()
-            ) {
-                return@withContext null
+                val uri =
+                    jsonObject.optString("uri")
+
+                if (
+                    title.isBlank() ||
+                    uri.isBlank()
+                ) {
+                    return null
+                }
+
+                val artist =
+                    jsonObject
+                        .optString("artist")
+                        .takeIf {
+                            it.isNotBlank()
+                        }
+
+                val album =
+                    jsonObject
+                        .optString("album")
+                        .takeIf {
+                            it.isNotBlank()
+                        }
+
+                val duration =
+                    if (
+                        jsonObject.has("duration") &&
+                        !jsonObject.isNull("duration")
+                    ) {
+                        jsonObject.optLong("duration")
+                    } else {
+                        null
+                    }
+
+                val coverArt =
+                    jsonObject
+                        .optString("coverArt")
+                        .takeIf {
+                            it.isNotBlank()
+                        }
+
+                return MediaSource(
+                    title = title,
+                    uri = uri,
+                    artist = artist,
+                    album = album,
+                    duration = duration,
+                    coverArt = coverArt
+                )
             }
 
-            MediaSource(
-                title = title,
-                uri = uri
+            val bestMatch =
+                parseMedia(media)
+                    ?: return@withContext null
+
+            Log.d(
+                "SYNAPSE_MEDIA",
+                "BACKEND RESULT: " +
+                        "title=${bestMatch.title} " +
+                        "artist=${bestMatch.artist} " +
+                        "album=${bestMatch.album}"
+            )
+
+            // -----------------------------
+            // ALTERNATIVE RESULTS
+            // -----------------------------
+
+            val alternatives =
+                mutableListOf<MediaSource>()
+
+            val resultsArray =
+                json.optJSONArray("results")
+
+            if (resultsArray != null) {
+
+                for (i in 0 until resultsArray.length()) {
+
+                    val resultObject =
+                        resultsArray.optJSONObject(i)
+                            ?: continue
+
+                    val result =
+                        parseMedia(resultObject)
+                            ?: continue
+
+                    // Don't duplicate best match
+                    if (
+                        result.uri != bestMatch.uri
+                    ) {
+                        alternatives.add(result)
+                    }
+                }
+            }
+
+            Log.d(
+                "SYNAPSE_MEDIA",
+                "ALTERNATIVES FOUND: ${alternatives.size}"
+            )
+
+            return@withContext MediaSearchResult(
+                bestMatch = bestMatch,
+                alternatives = alternatives
             )
 
         } catch (e: Exception) {
 
-            e.printStackTrace()
+            Log.e(
+                "SYNAPSE_MEDIA",
+                "BACKEND ERROR: ${e.message}",
+                e
+            )
 
             null
 
