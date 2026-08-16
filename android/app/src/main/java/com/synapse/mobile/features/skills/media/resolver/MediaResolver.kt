@@ -1,36 +1,32 @@
 package com.synapse.mobile.features.skills.media.resolver
 
-import android.net.Uri
+import com.synapse.mobile.features.skills.media.provider.MediaProvider
 
-class MediaResolver {
+class MediaResolver(
+    private val providers: List<MediaProvider>
+) {
 
-    /**
-     * Resolves a user's media query into a playable media URI.
-     *
-     * For now this is a simple catalog-based resolver.
-     * Later this can be connected to a backend/media provider.
-     */
-    fun resolve(query: String): Uri? {
+    suspend fun resolve(
+        query: String
+    ): MediaSource? {
 
-        val normalized = query
-            .lowercase()
-            .trim()
+        val normalized =
+            query.trim()
 
-        return when {
-
-            // Temporary test media
-            normalized == "test" ->
-                Uri.parse(
-                    "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-                )
-
-            normalized == "test song" ->
-                Uri.parse(
-                    "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-                )
-
-            else ->
-                null
+        if (normalized.isBlank()) {
+            return null
         }
+
+        for (provider in providers) {
+
+            val result =
+                provider.search(normalized)
+
+            if (result != null) {
+                return result
+            }
+        }
+
+        return null
     }
 }

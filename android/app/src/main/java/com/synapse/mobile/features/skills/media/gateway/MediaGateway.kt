@@ -2,7 +2,7 @@ package com.synapse.mobile.features.skills.media.gateway
 
 interface MediaGateway {
 
-    fun play(query: String): Boolean
+    suspend fun play(query: String): Boolean
 
     fun pause(): Boolean
 

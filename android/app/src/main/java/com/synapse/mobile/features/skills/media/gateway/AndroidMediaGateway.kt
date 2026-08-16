@@ -6,33 +6,61 @@ import androidx.media3.exoplayer.ExoPlayer
 import com.synapse.mobile.features.skills.media.resolver.MediaResolver
 
 class AndroidMediaGateway(
-    context: Context
+    context: Context,
+    private val resolver: MediaResolver
 ) : MediaGateway {
-
-    private val resolver =
-        MediaResolver()
 
     private val player: ExoPlayer =
         ExoPlayer.Builder(
             context.applicationContext
         ).build()
 
+    // Current playback queue
+    private val queue =
+        mutableListOf<MediaItem>()
 
+    override suspend fun play(
+        query: String
+    ): Boolean {
 
-    override fun play(query: String): Boolean {
         return try {
 
-            val mediaUri =
+            val source =
                 resolver.resolve(query)
                     ?: return false
 
             val mediaItem =
-                MediaItem.fromUri(mediaUri)
+                MediaItem.Builder()
+                    .setUri(source.uri)
+                    .setMediaId(source.title)
+                    .build()
 
-            player.setMediaItem(mediaItem)
+            // Avoid duplicate items
+            val alreadyExists =
+                queue.any {
+                    it.mediaId == mediaItem.mediaId
+                }
+
+            if (!alreadyExists) {
+                queue.add(mediaItem)
+            }
+
+            val currentIndex =
+                queue.indexOfFirst {
+                    it.mediaId == mediaItem.mediaId
+                }
+
+            if (currentIndex == -1) {
+                return false
+            }
+
+            player.setMediaItems(
+                queue.toList(),
+                currentIndex,
+                0L
+            )
 
             player.prepare()
-
             player.play()
 
             true
@@ -93,17 +121,14 @@ class AndroidMediaGateway(
     override fun next(): Boolean {
         return try {
 
-            if (player.hasNextMediaItem()) {
-
-                player.seekToNextMediaItem()
-                player.play()
-
-                true
-
-            } else {
-
-                false
+            if (!player.hasNextMediaItem()) {
+                return false
             }
+
+            player.seekToNextMediaItem()
+            player.play()
+
+            true
 
         } catch (e: Exception) {
 
@@ -116,17 +141,14 @@ class AndroidMediaGateway(
     override fun previous(): Boolean {
         return try {
 
-            if (player.hasPreviousMediaItem()) {
-
-                player.seekToPreviousMediaItem()
-                player.play()
-
-                true
-
-            } else {
-
-                false
+            if (!player.hasPreviousMediaItem()) {
+                return false
             }
+
+            player.seekToPreviousMediaItem()
+            player.play()
+
+            true
 
         } catch (e: Exception) {
 

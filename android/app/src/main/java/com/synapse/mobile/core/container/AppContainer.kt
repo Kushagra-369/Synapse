@@ -1,5 +1,9 @@
 package com.synapse.mobile.core.container
 
+import com.synapse.mobile.features.skills.media.provider.BackendMediaProvider
+import com.synapse.mobile.features.skills.media.provider.CatalogMediaProvider
+import com.synapse.mobile.features.skills.media.provider.MediaProvider
+import com.synapse.mobile.features.skills.media.resolver.MediaResolver
 import android.content.Context
 import com.synapse.mobile.core.dispatcher.SkillRegistry
 import com.synapse.mobile.features.skills.clock.ClockSkill
@@ -56,9 +60,24 @@ class AppContainer(
         AndroidWhatsAppGateway(context)
     val youtubeGateway: YouTubeGateway =
         AndroidYouTubeGateway(context)
+    val mediaProviders: List<MediaProvider> =
+        listOf(
+            CatalogMediaProvider(),
+
+            BackendMediaProvider(
+                "http://YOUR_SERVER_IP:PORT"
+            )
+        )
+
+    val mediaResolver =
+        MediaResolver(mediaProviders)
 
     val mediaGateway: MediaGateway =
-        AndroidMediaGateway(context)
+        AndroidMediaGateway(
+            context,
+            mediaResolver
+        )
+
     val galleryGateway: GalleryGateway =
         AndroidGalleryGateway(context)
     val flashlightGateway: FlashlightGateway =
