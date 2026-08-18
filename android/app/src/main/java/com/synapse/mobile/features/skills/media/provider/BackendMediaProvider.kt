@@ -18,9 +18,18 @@ class BackendMediaProvider(
         query: String
     ): MediaSearchResult? = withContext(Dispatchers.IO) {
 
+        Log.d(
+            "SYNAPSE_MEDIA",
+            "BACKEND PROVIDER CALLED: query=$query baseUrl=$baseUrl"
+        )
+
         var connection: HttpURLConnection? = null
 
         try {
+
+            // =====================================================
+            // 1. ENCODE SEARCH QUERY
+            // =====================================================
 
             val encodedQuery =
                 URLEncoder.encode(
@@ -33,12 +42,25 @@ class BackendMediaProvider(
                     "$baseUrl/api/media/search?q=$encodedQuery"
                 )
 
+            Log.d(
+                "SYNAPSE_MEDIA",
+                "BACKEND URL: $url"
+            )
+
+            // =====================================================
+            // 2. HTTP REQUEST
+            // =====================================================
+
             connection =
                 url.openConnection() as HttpURLConnection
 
             connection.requestMethod = "GET"
-            connection.connectTimeout = 10_000
-            connection.readTimeout = 10_000
+            connection.connectTimeout = 15_000
+            connection.readTimeout = 30_000
+            connection.setRequestProperty(
+                "Accept",
+                "application/json"
+            )
 
             val responseCode =
                 connection.responseCode
@@ -49,49 +71,131 @@ class BackendMediaProvider(
             )
 
             if (responseCode !in 200..299) {
+
+                Log.e(
+                    "SYNAPSE_MEDIA",
+                    "BACKEND REQUEST FAILED: HTTP $responseCode"
+                )
+
                 return@withContext null
             }
+
+            // =====================================================
+            // 3. READ RESPONSE
+            // =====================================================
 
             val response =
                 connection.inputStream
                     .bufferedReader()
-                    .use { it.readText() }
+                    .use {
+                        it.readText()
+                    }
+
+            Log.d(
+                "SYNAPSE_MEDIA",
+                "BACKEND RAW RESPONSE: $response"
+            )
+
+            if (response.isBlank()) {
+
+                Log.e(
+                    "SYNAPSE_MEDIA",
+                    "BACKEND RESPONSE EMPTY"
+                )
+
+                return@withContext null
+            }
 
             val json =
                 JSONObject(response)
 
+            // =====================================================
+            // 4. CHECK SUCCESS
+            // =====================================================
+
             if (!json.optBoolean("success", false)) {
+
+                Log.e(
+                    "SYNAPSE_MEDIA",
+                    "BACKEND SUCCESS = FALSE"
+                )
+
                 return@withContext null
             }
 
-            // -----------------------------
-            // BEST MATCH
-            // -----------------------------
-
-            val media =
-                json.optJSONObject("media")
-                    ?: return@withContext null
+            // =====================================================
+            // 5. PARSE MEDIA OBJECT
+            // =====================================================
 
             fun parseMedia(
                 jsonObject: JSONObject
             ): MediaSource? {
 
                 val title =
-                    jsonObject.optString("title")
+                    jsonObject
+                        .optString("title")
+                        .trim()
 
-                val uri =
-                    jsonObject.optString("uri")
+                val backendUri =
+                    jsonObject
+                        .optString("uri")
+                        .trim()
 
-                if (
-                    title.isBlank() ||
-                    uri.isBlank()
-                ) {
+                // -------------------------------------------------
+                // IMPORTANT:
+                //
+                // Backend already returns:
+                //
+                // http://192.168.1.5:6969/api/media/stream/g9E62
+                //
+                // DO NOT convert it again.
+                // -------------------------------------------------
+
+                if (title.isBlank()) {
+
+                    Log.w(
+                        "SYNAPSE_MEDIA",
+                        "SKIPPING MEDIA: title empty"
+                    )
+
                     return null
                 }
+
+                if (backendUri.isBlank()) {
+
+                    Log.w(
+                        "SYNAPSE_MEDIA",
+                        "SKIPPING MEDIA: uri empty"
+                    )
+
+                    return null
+                }
+
+                // -------------------------------------------------
+                // Use backend URI directly
+                // -------------------------------------------------
+
+                val uri =
+                    when {
+
+                        backendUri.startsWith("http://") ||
+                                backendUri.startsWith("https://") -> {
+
+                            backendUri
+                        }
+
+                        else -> {
+
+                            // Safety fallback if backend somehow
+                            // returns only a path.
+                            "$baseUrl/${backendUri.trimStart('/')}"
+                        }
+                    }
 
                 val artist =
                     jsonObject
                         .optString("artist")
+                        .trim()
                         .takeIf {
                             it.isNotBlank()
                         }
@@ -99,6 +203,7 @@ class BackendMediaProvider(
                 val album =
                     jsonObject
                         .optString("album")
+                        .trim()
                         .takeIf {
                             it.isNotBlank()
                         }
@@ -108,46 +213,83 @@ class BackendMediaProvider(
                         jsonObject.has("duration") &&
                         !jsonObject.isNull("duration")
                     ) {
+
                         jsonObject.optLong("duration")
+
                     } else {
+
                         null
                     }
 
                 val coverArt =
                     jsonObject
                         .optString("coverArt")
+                        .trim()
                         .takeIf {
                             it.isNotBlank()
                         }
 
-                return MediaSource(
-                    title = title,
-                    uri = uri,
-                    artist = artist,
-                    album = album,
-                    duration = duration,
-                    coverArt = coverArt
+                val mediaSource =
+                    MediaSource(
+                        title = title,
+                        uri = uri,
+                        artist = artist,
+                        album = album,
+                        duration = duration,
+                        coverArt = coverArt
+                    )
+
+                Log.d(
+                    "SYNAPSE_MEDIA",
+                    "PARSED MEDIA: $mediaSource"
                 )
+
+                return mediaSource
             }
 
-            val bestMatch =
-                parseMedia(media)
-                    ?: return@withContext null
+            // =====================================================
+            // 6. BEST MATCH FROM BACKEND
+            // =====================================================
+
+            val media =
+                json.optJSONObject("media")
+                    ?: run {
+
+                        Log.e(
+                            "SYNAPSE_MEDIA",
+                            "MEDIA OBJECT MISSING"
+                        )
+
+                        return@withContext null
+                    }
 
             Log.d(
                 "SYNAPSE_MEDIA",
-                "BACKEND RESULT: " +
-                        "title=${bestMatch.title} " +
-                        "artist=${bestMatch.artist} " +
-                        "album=${bestMatch.album}"
+                "MEDIA OBJECT FOUND: $media"
             )
 
-            // -----------------------------
-            // ALTERNATIVE RESULTS
-            // -----------------------------
+            val initialBestMatch =
+                parseMedia(media)
+                    ?: run {
 
-            val alternatives =
+                        Log.e(
+                            "SYNAPSE_MEDIA",
+                            "FAILED TO PARSE BEST MATCH"
+                        )
+
+                        return@withContext null
+                    }
+
+            // =====================================================
+            // 7. PARSE ALTERNATIVE RESULTS
+            // =====================================================
+
+            val allResults =
                 mutableListOf<MediaSource>()
+
+            allResults.add(
+                initialBestMatch
+            )
 
             val resultsArray =
                 json.optJSONArray("results")
@@ -164,19 +306,214 @@ class BackendMediaProvider(
                         parseMedia(resultObject)
                             ?: continue
 
-                    // Don't duplicate best match
+                    // Avoid duplicates
                     if (
-                        result.uri != bestMatch.uri
+                        allResults.none {
+                            it.uri == result.uri
+                        }
                     ) {
-                        alternatives.add(result)
+
+                        allResults.add(result)
                     }
                 }
             }
 
             Log.d(
                 "SYNAPSE_MEDIA",
+                "TOTAL RESULTS: ${allResults.size}"
+            )
+
+            // =====================================================
+            // 8. USER QUERY PARSING
+            // =====================================================
+
+            val normalizedQuery =
+                query
+                    .lowercase()
+                    .trim()
+
+            val hasBy =
+                normalizedQuery.contains(" by ")
+
+            val artistConstraint =
+                if (hasBy) {
+
+                    normalizedQuery
+                        .substringAfter(" by ")
+                        .trim()
+
+                } else {
+
+                    ""
+                }
+
+            val songConstraint =
+                if (hasBy) {
+
+                    normalizedQuery
+                        .substringBefore(" by ")
+                        .trim()
+
+                } else {
+
+                    normalizedQuery
+                }
+
+            Log.d(
+                "SYNAPSE_MEDIA",
+                "SONG CONSTRAINT: $songConstraint"
+            )
+
+            Log.d(
+                "SYNAPSE_MEDIA",
+                "ARTIST CONSTRAINT: $artistConstraint"
+            )
+
+            // =====================================================
+            // 9. RANK RESULTS
+            // =====================================================
+
+            val bestMatch =
+                if (artistConstraint.isNotBlank()) {
+
+                    allResults
+                        .map { result ->
+
+                            val title =
+                                result.title
+                                    .lowercase()
+                                    .trim()
+
+                            val artist =
+                                result.artist
+                                    ?.lowercase()
+                                    ?.trim()
+                                    ?: ""
+
+                            var score = 0
+
+                            // -------------------------------
+                            // Exact title
+                            // -------------------------------
+
+                            if (
+                                title == songConstraint
+                            ) {
+
+                                score += 500
+
+                            } else if (
+                                title.contains(songConstraint)
+                            ) {
+
+                                score += 250
+                            }
+
+                            // -------------------------------
+                            // Exact artist
+                            // -------------------------------
+
+                            if (
+                                artist == artistConstraint
+                            ) {
+
+                                score += 1000
+
+                            } else if (
+                                artist.contains(artistConstraint)
+                            ) {
+
+                                score += 700
+                            }
+
+                            // -------------------------------
+                            // Artist inside title
+                            // -------------------------------
+
+                            if (
+                                title.contains(artistConstraint)
+                            ) {
+
+                                score += 100
+                            }
+
+                            result to score
+                        }
+                        .sortedByDescending {
+                            it.second
+                        }
+                        .also { ranked ->
+
+                            Log.d(
+                                "SYNAPSE_MEDIA",
+                                "ANDROID RANKING:"
+                            )
+
+                            ranked
+                                .take(10)
+                                .forEachIndexed {
+                                        index,
+                                        pair ->
+
+                                    Log.d(
+                                        "SYNAPSE_MEDIA",
+                                        "${index + 1}. " +
+                                                "${pair.first.title} | " +
+                                                "${pair.first.artist} | " +
+                                                "score=${pair.second}"
+                                    )
+                                }
+                        }
+                        .firstOrNull()
+                        ?.first
+
+                } else {
+
+                    initialBestMatch
+                }
+
+                    ?: run {
+
+                        Log.e(
+                            "SYNAPSE_MEDIA",
+                            "NO BEST MATCH FOUND"
+                        )
+
+                        return@withContext null
+                    }
+
+            // =====================================================
+            // 10. ALTERNATIVES
+            // =====================================================
+
+            val alternatives =
+                allResults.filter {
+                    it.uri != bestMatch.uri
+                }
+
+            Log.d(
+                "SYNAPSE_MEDIA",
+                "BEST MATCH: ${bestMatch.title}"
+            )
+
+            Log.d(
+                "SYNAPSE_MEDIA",
+                "BEST URI: ${bestMatch.uri}"
+            )
+
+            Log.d(
+                "SYNAPSE_MEDIA",
+                "BEST ARTIST: ${bestMatch.artist}"
+            )
+
+            Log.d(
+                "SYNAPSE_MEDIA",
                 "ALTERNATIVES FOUND: ${alternatives.size}"
             )
+
+            // =====================================================
+            // 11. FINAL RESULT
+            // =====================================================
 
             return@withContext MediaSearchResult(
                 bestMatch = bestMatch,
@@ -191,7 +528,7 @@ class BackendMediaProvider(
                 e
             )
 
-            null
+            return@withContext null
 
         } finally {
 

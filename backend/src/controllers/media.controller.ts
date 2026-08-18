@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { Media } from "../models/media.model";
+import { searchAudius } from "../services/media/audius.service";
 
 export const searchMedia = async (
     req: Request,
@@ -37,10 +38,37 @@ export const searchMedia = async (
         }).lean();
 
         if (results.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "Media not found"
-            });
+
+            try {
+
+                const externalResults =
+                    await searchAudius(query);
+
+                if (externalResults.length === 0) {
+                    return res.status(404).json({
+                        success: false,
+                        message: "Media not found"
+                    });
+                }
+
+                return res.json({
+                    success: true,
+                    media: externalResults[0],
+                    results: externalResults
+                });
+
+            } catch (error) {
+
+                console.error(
+                    "External media search failed:",
+                    error
+                );
+
+                return res.status(502).json({
+                    success: false,
+                    message: "Music search unavailable"
+                });
+            }
         }
 
         const ranked = results
@@ -145,5 +173,188 @@ export const searchMedia = async (
             success: false,
             message: "Media search failed"
         });
+    }
+};
+
+export const streamMedia = async (
+    req: Request,
+    res: Response
+) => {
+
+    try {
+
+        const trackId =
+            String(req.params.trackId || "")
+                .trim();
+
+        if (!trackId) {
+            return res.status(400).json({
+                success: false,
+                message: "Track ID is required"
+            });
+        }
+
+        const audiusUrl =
+            `https://api.audius.co/v1/tracks/${encodeURIComponent(trackId)}/stream`;
+
+        console.log(
+            `[AUDIUS STREAM] Proxying track: ${trackId}`
+        );
+
+        const response =
+            await fetch(
+                audiusUrl,
+                {
+                    method: "GET",
+                    redirect: "follow",
+                    headers: {
+                        "User-Agent":
+                            "Mozilla/5.0",
+                        "Accept":
+                            "*/*"
+                    }
+                }
+            );
+
+        console.log(
+            `[AUDIUS STREAM] Response: ${response.status}`
+        );
+
+        if (!response.ok) {
+
+            const errorText =
+                await response.text();
+
+            console.error(
+                `[AUDIUS STREAM] Failed: ` +
+                `${response.status} ` +
+                errorText
+            );
+
+            return res.status(
+                response.status
+            ).json({
+                success: false,
+                message:
+                    "Unable to stream media"
+            });
+        }
+
+        if (!response.body) {
+
+            return res.status(502).json({
+                success: false,
+                message:
+                    "Audius returned empty stream"
+            });
+        }
+
+
+        // Forward content type
+        const contentType =
+            response.headers.get(
+                "content-type"
+            );
+
+        if (contentType) {
+
+            res.setHeader(
+                "Content-Type",
+                contentType
+            );
+        }
+        else {
+
+            res.setHeader(
+                "Content-Type",
+                "audio/mpeg"
+            );
+        }
+
+
+        // Forward content length
+        const contentLength =
+            response.headers.get(
+                "content-length"
+            );
+
+        if (contentLength) {
+
+            res.setHeader(
+                "Content-Length",
+                contentLength
+            );
+        }
+
+
+        // Forward range support
+        const acceptRanges =
+            response.headers.get(
+                "accept-ranges"
+            );
+
+        if (acceptRanges) {
+
+            res.setHeader(
+                "Accept-Ranges",
+                acceptRanges
+            );
+        }
+
+
+        // Stream body
+        const reader =
+            response.body.getReader();
+
+        try {
+
+            while (true) {
+
+                const {
+                    done,
+                    value
+                } =
+                    await reader.read();
+
+                if (done) {
+                    break;
+                }
+
+                if (value) {
+
+                    res.write(
+                        Buffer.from(value)
+                    );
+                }
+            }
+
+        }
+        finally {
+
+            reader.releaseLock();
+        }
+
+        res.end();
+
+    }
+    catch (error) {
+
+        console.error(
+            "[AUDIUS STREAM] Error:",
+            error
+        );
+
+        if (
+            !res.headersSent
+        ) {
+
+            return res.status(500).json({
+                success: false,
+                message:
+                    "Media streaming failed"
+            });
+        }
+
+        res.end();
     }
 };

@@ -51,6 +51,11 @@ class MediaResolver(
             val result =
                 provider.search(normalized)
 
+            Log.d(
+                "SYNAPSE_MEDIA",
+                "SEARCH RESULT: $result"
+            )
+
             if (result != null) {
 
                 Log.d(

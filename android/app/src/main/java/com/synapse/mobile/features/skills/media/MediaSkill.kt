@@ -34,10 +34,6 @@ class MediaSkill(
         command: Command
     ): CommandResult {
 
-        // -----------------------------------------
-        // PLAY ACTION
-        // -----------------------------------------
-
         val playAction =
             actions["play"]
                 ?: return CommandResult(
@@ -45,12 +41,15 @@ class MediaSkill(
                     "Play action unavailable."
                 )
 
-        // -----------------------------------------
-        // SELECTION
+        // =====================================================
+        // MANUAL SELECTION
         // Example:
         // "second one"
         // selectionIndex = 1
-        // -----------------------------------------
+        //
+        // This is kept only for compatibility.
+        // Normal music requests will NOT enter this path.
+        // =====================================================
 
         val selectionIndex =
             command.parameters["selectionIndex"]
@@ -63,12 +62,9 @@ class MediaSkill(
         ) {
 
             val selected =
-                selectionState.takeByIndex(
-                    selectionIndex
-                )
+                selectionState.takeByIndex(selectionIndex)
 
             if (selected == null) {
-
                 return CommandResult(
                     success = false,
                     message = "Invalid media selection."
@@ -102,9 +98,9 @@ class MediaSkill(
             )
         }
 
-        // -----------------------------------------
+        // =====================================================
         // NORMAL ACTION
-        // -----------------------------------------
+        // =====================================================
 
         val action =
             actions[command.action]
@@ -114,17 +110,17 @@ class MediaSkill(
                         "Unknown media action: ${command.action}"
                 )
 
-        // -----------------------------------------
+        // =====================================================
         // NON-PLAY ACTIONS
-        // -----------------------------------------
+        // =====================================================
 
         if (command.action != "play") {
             return action.execute(command)
         }
 
-        // -----------------------------------------
+        // =====================================================
         // PLAY QUERY
-        // -----------------------------------------
+        // =====================================================
 
         val query =
             command.parameters["query"]
@@ -132,16 +128,20 @@ class MediaSkill(
                 ?.trim()
 
         if (query.isNullOrBlank()) {
-
             return CommandResult(
                 success = false,
                 message = "Media query missing."
             )
         }
 
-        // -----------------------------------------
+        // =====================================================
         // RESOLVE MEDIA
-        // -----------------------------------------
+        //
+        // Resolver returns the BEST MATCH.
+        //
+        // We intentionally ignore alternatives here.
+        // Synapse should automatically play the best result.
+        // =====================================================
 
         val result =
             resolver.resolveDetailed(query)
@@ -153,109 +153,18 @@ class MediaSkill(
         val bestMatch =
             result.bestMatch
 
-        val alternatives =
-            result.alternatives
-
-        // -----------------------------------------
-        // EXACT TITLE MATCH
-        // -----------------------------------------
-
-        if (
-            bestMatch.title.equals(
-                query,
-                ignoreCase = true
-            )
-        ) {
-
-            selectionState.clear()
-
-            return playAction.execute(
-                command.copy(
-                    action = "play",
-                    parameters =
-                        command.parameters
-                            .toMutableMap()
-                            .apply {
-
-                                this["query"] =
-                                    bestMatch.title
-
-                                this["resolvedUri"] =
-                                    bestMatch.uri
-
-                                this["resolvedTitle"] =
-                                    bestMatch.title
-
-                                this["resolvedArtist"] =
-                                    bestMatch.artist ?: ""
-
-                                this["resolvedAlbum"] =
-                                    bestMatch.album ?: ""
-                            }
-                )
-            )
-        }
-
-        // -----------------------------------------
-        // AMBIGUOUS RESULT
-        // -----------------------------------------
-
-        if (alternatives.isNotEmpty()) {
-
-            val allResults =
-                listOf(bestMatch) + alternatives
-
-            selectionState.setResults(
-                allResults
-            )
-
-            val options =
-                buildString {
-
-                    append(
-                        "I found multiple matches. "
-                    )
-
-                    allResults
-                        .take(3)
-                        .forEachIndexed { index, media ->
-
-                            if (index > 0) {
-                                append(", ")
-                            }
-
-                            append(
-                                "${index + 1}. "
-                            )
-
-                            append(
-                                media.title
-                            )
-
-                            media.artist?.let {
-
-                                append(
-                                    " by $it"
-                                )
-                            }
-                        }
-
-                    append(
-                        ". Please specify which one you want."
-                    )
-                }
-
-            return CommandResult(
-                success = false,
-                message = options
-            )
-        }
-
-        // -----------------------------------------
-        // SINGLE NON-EXACT MATCH
-        // -----------------------------------------
+        // =====================================================
+        // CLEAR OLD SELECTION
+        // =====================================================
 
         selectionState.clear()
+
+        // =====================================================
+        // DIRECT PLAY
+        //
+        // Whatever the resolver considers the best match,
+        // play it immediately.
+        // =====================================================
 
         return playAction.execute(
             command.copy(
